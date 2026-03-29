@@ -47,8 +47,8 @@ const FALLBACK_MANIFEST: AssetManifest = {
   characters: {
     default: {
       sheetUrl: '/assets/character-default.png',
-      frameWidth: 16,
-      frameHeight: 24,
+      frameWidth: 32,
+      frameHeight: 32,
       animations: {
         idle:      { frames: [0, 1],          fps: 2, loop: true },
         typing:    { frames: [4, 5, 6, 7],    fps: 8, loop: true },
@@ -138,6 +138,9 @@ export class PixelOfficeEngine {
   // ─── State ───
   private initialized: boolean = false;
 
+  // ─── Pending agents (queued before initialization) ───
+  private pendingAgents: AgentState[] = [];
+
   // ─── Cached tile lists for behavior ───
   private walkableTiles: { x: number; y: number }[] = [];
   private breakTiles: { x: number; y: number }[] = [];
@@ -181,6 +184,14 @@ export class PixelOfficeEngine {
 
   /** Update an existing agent's state. */
   updateAgent(state: AgentState): void {
+    if (!this.initialized) {
+      // Queue until engine is ready
+      const idx = this.pendingAgents.findIndex(a => a.id === state.id);
+      if (idx >= 0) this.pendingAgents[idx] = state;
+      else this.pendingAgents.push(state);
+      return;
+    }
+
     const character = this.characters.get(state.id);
     if (character) {
       const oldPos = character.getTilePosition();
@@ -203,6 +214,14 @@ export class PixelOfficeEngine {
 
   /** Add a new agent to the scene. */
   addAgent(state: AgentState): void {
+    if (!this.initialized) {
+      // Queue until engine is ready
+      if (!this.pendingAgents.find(a => a.id === state.id)) {
+        this.pendingAgents.push(state);
+      }
+      return;
+    }
+
     if (this.characters.has(state.id)) {
       // Already exists, just update
       this.updateAgent(state);
@@ -350,6 +369,12 @@ export class PixelOfficeEngine {
     this.cacheMovementTiles();
 
     this.initialized = true;
+
+    // Process any agents that were queued before initialization
+    for (const pendingState of this.pendingAgents) {
+      this.addAgent(pendingState);
+    }
+    this.pendingAgents = [];
   }
 
   private async loadSharedModules(): Promise<void> {
@@ -462,8 +487,8 @@ export class PixelOfficeEngine {
     const defaultChar = this.manifest.characters['default'];
     const sheet = new SpriteSheet(
       defaultChar?.sheetUrl ?? '/assets/character-default.png',
-      defaultChar?.frameWidth ?? 16,
-      defaultChar?.frameHeight ?? 24
+      defaultChar?.frameWidth ?? 32,
+      defaultChar?.frameHeight ?? 32
     );
     this.characterSpriteSheets.set('default', sheet);
 

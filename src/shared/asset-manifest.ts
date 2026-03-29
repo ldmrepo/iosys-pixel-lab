@@ -1,15 +1,15 @@
 import type { AssetManifest, CharacterSprite, SpriteAnimation, AgentStatus } from './types';
 
 /**
- * Sprite sheet layout:
- *   4 columns x 7 rows, each frame 16x24
- *   Row 0: idle     (frames 0,1)
- *   Row 1: typing   (frames 4,5,6,7)
- *   Row 2: reading  (frames 8,9)
- *   Row 3: executing(frames 12,13,14,15)
- *   Row 4: waiting  (frames 16,17)
- *   Row 5: done     (frames 20,21)
- *   Row 6: error    (frames 24,25)
+ * Sprite sheet layout (MetroCity CC0 composited):
+ *   4 columns x 7 rows, each frame 32x32  (sheet = 128x224)
+ *   Row 0: idle      (frames 0,1)        — down idle1, idle2
+ *   Row 1: typing    (frames 4,5,6,7)    — down idle1, idle2, idle1, idle2
+ *   Row 2: reading   (frames 8,9)        — down idle1, idle2
+ *   Row 3: executing (frames 12,13,14,15)— down walk1..walk4
+ *   Row 4: waiting   (frames 16,17)      — down idle1, idle2
+ *   Row 5: done      (frames 20,21)      — down idle1, idle2
+ *   Row 6: error     (frames 24,25)      — down idle1, idle2
  *
  * Frame index = row * 4 + col
  */
@@ -31,8 +31,8 @@ const standardAnimations: Record<AgentStatus, SpriteAnimation> = {
 function characterSprite(id: string): CharacterSprite {
   return {
     sheetUrl: `/assets/sprites/${id}.png`,
-    frameWidth: 16,
-    frameHeight: 24,
+    frameWidth: 32,
+    frameHeight: 32,
     animations: standardAnimations,
   };
 }
@@ -44,6 +44,7 @@ export const assetManifest: AssetManifest = {
     columns: 8,
   },
   characters: {
+    default: characterSprite('claude'),
     claude: characterSprite('claude'),
     codex: characterSprite('codex'),
     gemini: characterSprite('gemini'),

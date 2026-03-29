@@ -253,9 +253,12 @@ export class Character {
     const fw = this.spriteSheet.frameWidth * scale;
     const fh = this.spriteSheet.frameHeight * scale;
 
-    // Draw sprite centered on position
+    // Draw sprite bottom-center aligned: feet land on tile center.
+    // worldX/worldY is the tile center. The sprite's horizontal center
+    // aligns with screen.x, while its bottom edge aligns with the
+    // bottom of the tile (screen.y + half a tile in screen space).
     const drawX = screen.x - fw / 2;
-    const drawY = screen.y - fh / 2;
+    const drawY = screen.y - fh + (this.tileSize * scale) / 2;
 
     if (this.spriteSheet.isLoaded) {
       this.spriteSheet.drawFrame(ctx, frameIndex, drawX, drawY, scale);
@@ -278,31 +281,37 @@ export class Character {
     cy: number,
     scale: number
   ): void {
-    const size = this.tileSize * scale * 0.7;
-    const halfSize = size / 2;
+    const fw = this.spriteSheet.frameWidth * scale;
+    const fh = this.spriteSheet.frameHeight * scale;
+
+    // Bottom-center aligned, matching the sprite draw position
+    const drawX = cx - fw / 2;
+    const drawY = cy - fh + (this.tileSize * scale) / 2;
 
     ctx.fillStyle = this.getStatusColor(this.state.status);
     ctx.fillRect(
-      Math.round(cx - halfSize),
-      Math.round(cy - halfSize),
-      Math.round(size),
-      Math.round(size)
+      Math.round(drawX),
+      Math.round(drawY),
+      Math.round(fw),
+      Math.round(fh)
     );
 
-    // Draw a small face
+    // Draw a small face centered in the upper portion of the rect
     ctx.fillStyle = '#ffffff';
     const eyeSize = Math.max(2, 2 * scale);
+    const faceCenterX = cx;
+    const faceCenterY = drawY + fh * 0.35;
     // Left eye
     ctx.fillRect(
-      Math.round(cx - halfSize * 0.4 - eyeSize / 2),
-      Math.round(cy - halfSize * 0.2 - eyeSize / 2),
+      Math.round(faceCenterX - fw * 0.15 - eyeSize / 2),
+      Math.round(faceCenterY - eyeSize / 2),
       eyeSize,
       eyeSize
     );
     // Right eye
     ctx.fillRect(
-      Math.round(cx + halfSize * 0.4 - eyeSize / 2),
-      Math.round(cy - halfSize * 0.2 - eyeSize / 2),
+      Math.round(faceCenterX + fw * 0.15 - eyeSize / 2),
+      Math.round(faceCenterY - eyeSize / 2),
       eyeSize,
       eyeSize
     );
@@ -455,14 +464,19 @@ export class Character {
   /** Check if a screen-space point hits this character. */
   hitTest(screenX: number, screenY: number, camera: Camera): boolean {
     const screen = camera.worldToScreen(this.worldX, this.worldY);
-    const halfW = (this.spriteSheet.frameWidth * camera.zoom) / 2;
-    const halfH = (this.spriteSheet.frameHeight * camera.zoom) / 2;
+    const scale = camera.zoom;
+    const fw = this.spriteSheet.frameWidth * scale;
+    const fh = this.spriteSheet.frameHeight * scale;
+
+    // Match the bottom-center aligned draw rect used in render()
+    const drawX = screen.x - fw / 2;
+    const drawY = screen.y - fh + (this.tileSize * scale) / 2;
 
     return (
-      screenX >= screen.x - halfW &&
-      screenX <= screen.x + halfW &&
-      screenY >= screen.y - halfH &&
-      screenY <= screen.y + halfH
+      screenX >= drawX &&
+      screenX <= drawX + fw &&
+      screenY >= drawY &&
+      screenY <= drawY + fh
     );
   }
 }
