@@ -161,23 +161,23 @@ async function main() {
   const out = createPNG(OUT_W, OUT_H);
 
   // -------------------------------------------------------
-  // Index 0: Floor (light) - from TilesHouse.png
-  // Grid position (3,4) = pixel (48,64), wood floor, avg rgb(183,166,144)
+  // ALL tiles are native 16x16 from TilesHouse.png — NO downscaling
   // -------------------------------------------------------
+
+  // Index 0: Floor (light) — warm brown wood plank (horizontal grain)
+  // grid(2,2) rgb(144,106,60) — matches demo floor
   {
     const pos = tilePos(0);
-    copyRegion(out, pos.x, pos.y, tilesHouse, 3 * 16, 4 * 16, TILE, TILE);
-    console.log('[extract] Tile 0 (floor light): TilesHouse grid(3,4)');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 2 * 16, 2 * 16, TILE, TILE);
+    console.log('[extract] Tile 0 (floor light): TilesHouse grid(2,2)');
   }
 
-  // -------------------------------------------------------
-  // Index 1: Floor (dark) - from TilesHouse.png
-  // Grid position (2,8) = pixel (32,128), darker wood, avg rgb(140,93,34)
-  // -------------------------------------------------------
+  // Index 1: Floor (dark) — slightly darker wood plank
+  // grid(3,3) rgb(120,75,18) — subtle contrast with index 0
   {
     const pos = tilePos(1);
-    copyRegion(out, pos.x, pos.y, tilesHouse, 2 * 16, 8 * 16, TILE, TILE);
-    console.log('[extract] Tile 1 (floor dark): TilesHouse grid(2,8)');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 3 * 16, 3 * 16, TILE, TILE);
+    console.log('[extract] Tile 1 (floor dark): TilesHouse grid(3,3)');
   }
 
   // -------------------------------------------------------
@@ -200,92 +200,68 @@ async function main() {
     console.log('[extract] Tile 3 (wall side): TilesHouse grid(25,1)');
   }
 
-  // -------------------------------------------------------
-  // Index 4: Desk (top surface) - from LivingRoom-Sheet.png
-  // Region (25,15, 46x16) - table/desk top surface
-  // Downscale 46x16 -> 16x16
-  // -------------------------------------------------------
+  // Index 4: Desk (top) — dark brown wood block (desk surface)
+  // grid(7,4) rgb(65,54,37) — solid dark wood, reads as desk/table top-down
   {
     const pos = tilePos(4);
-    nearestNeighborScale(livingRoomSheet, 25, 15, 46, 16, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 4 (desk top): LivingRoom table surface, downscaled 46x16->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 7 * 16, 4 * 16, TILE, TILE);
+    console.log('[extract] Tile 4 (desk top): TilesHouse grid(7,4)');
   }
 
-  // -------------------------------------------------------
-  // Index 5: Desk (front) - from Home/Miscellaneous-Sheet.png
-  // Region (591,35, 35x21) - drawer/cabinet front
-  // Downscale 35x21 -> 16x16
-  // -------------------------------------------------------
+  // Index 5: Desk (front) — dark brown wood with grain
+  // grid(8,4) rgb(65,54,37) — matches desk top, slight variation
   {
     const pos = tilePos(5);
-    nearestNeighborScale(miscSheetHome, 591, 35, 35, 21, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 5 (desk front): Home Misc cabinet front, downscaled 35x21->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 8 * 16, 4 * 16, TILE, TILE);
+    console.log('[extract] Tile 5 (desk front): TilesHouse grid(8,4)');
   }
 
-  // -------------------------------------------------------
-  // Index 6: Chair - from Kitchen1-Sheet.png
-  // Region (138,12, 12x20) - wooden chair
-  // Scale 12x20 -> 16x16
-  // -------------------------------------------------------
+  // Index 6: Chair — dark teal/navy block (modern office chair feel)
+  // grid(12,5) rgb(12,79,92) — reads as chair seat from top-down
   {
     const pos = tilePos(6);
-    nearestNeighborScale(kitchen1Sheet, 138, 12, 12, 20, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 6 (chair): Kitchen1 wooden chair, scaled 12x20->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 12 * 16, 5 * 16, TILE, TILE);
+    console.log('[extract] Tile 6 (chair): TilesHouse grid(12,5)');
   }
 
-  // -------------------------------------------------------
-  // Index 7: Plant - from Flowers-Sheet.png
-  // Region (22,3, 20x43) - large potted plant
-  // Downscale 20x43 -> 16x16
-  // -------------------------------------------------------
+  // Index 7: Plant — green cross/medical (reusing as plant indicator)
+  // grid(14,18) rgb(101,141,115) — green tile, reads as vegetation
   {
     const pos = tilePos(7);
-    nearestNeighborScale(flowersSheet, 22, 3, 20, 43, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 7 (plant): Flowers large plant, downscaled 20x43->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 14 * 16, 18 * 16, TILE, TILE);
+    console.log('[extract] Tile 7 (plant): TilesHouse grid(14,18)');
   }
 
-  // -------------------------------------------------------
-  // Index 8: Bookshelf - from Cupboard-Sheet.png
-  // Region (270,20, 36x43) - bookshelf with colored books
-  // Downscale 36x43 -> 16x16
-  // -------------------------------------------------------
+  // Index 8: Bookshelf — brown shelf piece with dark detail
+  // grid(0,16) rgb(125,101,72) — warm brown block, reads as furniture
   {
     const pos = tilePos(8);
-    nearestNeighborScale(cupboardSheet, 270, 20, 36, 43, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 8 (bookshelf): Cupboard bookshelf, downscaled 36x43->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 0 * 16, 16 * 16, TILE, TILE);
+    console.log('[extract] Tile 8 (bookshelf): TilesHouse grid(0,16)');
   }
 
-  // -------------------------------------------------------
-  // Index 9: Rug - from Carpet-Sheet.png
-  // Region (128,0, 64x64) - ornate carpet, full pattern
-  // Downscale 64x64 -> 16x16
-  // -------------------------------------------------------
+  // Index 9: Rug — golden/yellow decorative pattern
+  // grid(25,8) rgb(210,189,138) — warm golden tile, reads as rug/carpet area
   {
     const pos = tilePos(9);
-    nearestNeighborScale(carpetSheet, 128, 0, 64, 64, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 9 (rug): Carpet full pattern, downscaled 64x64->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 25 * 16, 8 * 16, TILE, TILE);
+    console.log('[extract] Tile 9 (rug): TilesHouse grid(25,8)');
   }
 
-  // -------------------------------------------------------
-  // Index 10: Monitor - from TV-Sheet.png
-  // Region (136,2, 48x27) - wide-screen monitor/TV
-  // Downscale 48x27 -> 16x16
-  // -------------------------------------------------------
+  // Index 10: Whiteboard/monitor — gray metal surface
+  // grid(16,4) rgb(60,60,60) — dark gray, reads as screen/board
   {
     const pos = tilePos(10);
-    nearestNeighborScale(tvSheet, 136, 2, 48, 27, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 10 (monitor): TV wide-screen, downscaled 48x27->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 16 * 16, 4 * 16, TILE, TILE);
+    console.log('[extract] Tile 10 (monitor): TilesHouse grid(16,4)');
   }
 
-  // -------------------------------------------------------
-  // Index 11: Water cooler - from Hospital/Miscellaneous-Sheet.png
-  // Region (2234,28, 12x18) - water dispenser
-  // Scale 12x18 -> 16x16
-  // -------------------------------------------------------
+  // Index 11: Water cooler — light gray metallic
+  // grid(9,9) rgb(140,142,144) — gray tile, reads as appliance
   {
     const pos = tilePos(11);
-    nearestNeighborScale(miscSheetHospital, 2234, 28, 12, 18, TILE, TILE, out, pos.x, pos.y);
-    console.log('[extract] Tile 11 (water cooler): Hospital Misc dispenser, scaled 12x18->16x16');
+    copyRegion(out, pos.x, pos.y, tilesHouse, 9 * 16, 9 * 16, TILE, TILE);
+    console.log('[extract] Tile 11 (water cooler): TilesHouse grid(9,9)');
   }
 
   // -------------------------------------------------------

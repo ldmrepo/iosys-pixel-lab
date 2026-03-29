@@ -19,6 +19,7 @@ import type {
   TileInfo,
   CharacterSprite,
   Seat,
+  FurnitureObject,
 } from '../shared/types';
 import { GameLoop } from './GameLoop';
 import { SpriteSheet } from './SpriteSheet';
@@ -26,6 +27,7 @@ import { Character } from './Character';
 import { TileMap } from './TileMap';
 import { PathFinder } from './PathFinder';
 import { Camera } from './Camera';
+import { ObjectRenderer } from './ObjectRenderer';
 
 // Re-export all engine modules for advanced usage
 export { GameLoop } from './GameLoop';
@@ -35,6 +37,7 @@ export { TileMap } from './TileMap';
 export { PathFinder } from './PathFinder';
 export { Camera } from './Camera';
 export { CharacterBehavior } from './CharacterBehavior';
+export { ObjectRenderer } from './ObjectRenderer';
 
 // ─── Fallback defaults when shared modules are not yet available ───
 
@@ -71,13 +74,13 @@ const FALLBACK_SEATS: Seat[] = [
 ];
 
 const FALLBACK_TILES = generateFallbackTiles(20, 15);
-applyFallbackFurniture(FALLBACK_TILES, FALLBACK_SEATS, 15, 20);
 
 const FALLBACK_LAYOUT: OfficeLayout = {
   width: 20,
   height: 15,
   tileSize: 16,
   tiles: FALLBACK_TILES,
+  furniture: [],
   seats: FALLBACK_SEATS,
 };
 
@@ -98,17 +101,6 @@ function generateFallbackTiles(w: number, h: number): TileInfo[][] {
   return tiles;
 }
 
-function applyFallbackFurniture(tiles: TileInfo[][], seats: Seat[], h: number, w: number): void {
-  for (const seat of seats) {
-    if (seat.deskTileY >= 0 && seat.deskTileY < h && seat.deskTileX >= 0 && seat.deskTileX < w) {
-      tiles[seat.deskTileY][seat.deskTileX] = { type: 'desk', walkable: false, spriteIndex: 2 };
-    }
-    if (seat.tileY >= 0 && seat.tileY < h && seat.tileX >= 0 && seat.tileX < w) {
-      tiles[seat.tileY][seat.tileX] = { type: 'chair', walkable: true, spriteIndex: 3 };
-    }
-  }
-}
-
 export class PixelOfficeEngine {
   // ─── Core systems ───
   private canvas: HTMLCanvasElement;
@@ -117,6 +109,7 @@ export class PixelOfficeEngine {
   private camera: Camera;
   private tileMap!: TileMap;
   private pathFinder!: PathFinder;
+  private objectRenderer!: ObjectRenderer;
 
   // ─── Sprite sheets ───
   private tileSpriteSheet!: SpriteSheet;
@@ -362,6 +355,15 @@ export class PixelOfficeEngine {
       this.camera.setZoom(Math.max(fitZoom, this.camera.minZoom));
     }
 
+    // Setup ObjectRenderer for multi-tile furniture
+    this.objectRenderer = new ObjectRenderer(this.layout.tileSize);
+    if (this.manifest.furnitureSheets) {
+      await this.objectRenderer.loadSheets(this.manifest.furnitureSheets);
+    }
+    if (this.layout.furniture) {
+      this.objectRenderer.setFurniture(this.layout.furniture);
+    }
+
     // Pre-load character sprite sheets
     await this.preloadCharacterSprites();
 
@@ -432,9 +434,36 @@ export class PixelOfficeEngine {
    * Break tiles = rug/floor tiles in the central area (not near desks).
    */
   private cacheMovementTiles(): void {
-    const { tiles, seats, width, height } = this.layout;
+    const { tiles, seats, furniture, width, height } = this.layout;
 
-    // Collect desk tile positions for proximity check
+    // Build walkability grid: start from floor tiles, then apply furniture masks
+    const walkGrid: boolean[][] = [];
+    for (let y = 0; y < height; y++) {
+      walkGrid[y] = [];
+      for (let x = 0; x < width; x++) {
+        walkGrid[y][x] = tiles[y]?.[x]?.walkable ?? false;
+      }
+    }
+
+    // Apply furniture footprints to walkability
+    if (furniture) {
+      for (const obj of furniture) {
+        for (let dy = 0; dy < obj.heightTiles; dy++) {
+          for (let dx = 0; dx < obj.widthTiles; dx++) {
+            const gx = obj.tileX + dx;
+            const gy = obj.tileY + dy;
+            if (gx < 0 || gx >= width || gy < 0 || gy >= height) continue;
+            const maskIdx = dy * obj.widthTiles + dx;
+            const isWalkable = obj.walkableMask ? obj.walkableMask[maskIdx] : false;
+            if (!isWalkable) {
+              walkGrid[gy][gx] = false;
+            }
+          }
+        }
+      }
+    }
+
+    // Collect desk positions for proximity check
     const deskPositions = new Set<string>();
     for (const seat of seats) {
       deskPositions.add(`${seat.deskTileX},${seat.deskTileY}`);
@@ -446,8 +475,7 @@ export class PixelOfficeEngine {
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        const tile = tiles[y]?.[x];
-        if (!tile || !tile.walkable) continue;
+        if (!walkGrid[y][x]) continue;
 
         this.walkableTiles.push({ x, y });
 
@@ -467,6 +495,11 @@ export class PixelOfficeEngine {
           }
         }
       }
+    }
+
+    // Also update TileMap walkability with the computed grid
+    if (this.tileMap) {
+      this.tileMap.setWalkGrid(walkGrid);
     }
 
     console.log(`[Engine] Cached ${this.walkableTiles.length} walkable tiles, ${this.breakTiles.length} break tiles`);
@@ -522,22 +555,56 @@ export class PixelOfficeEngine {
     // Disable image smoothing for crisp pixel art
     ctx.imageSmoothingEnabled = false;
 
-    // Layer 1: Floor tiles (floor + wall)
+    // Pass 1: Floor + wall tiles
     if (this.tileMap) {
       this.tileMap.render(ctx, cam);
     }
 
-    // Layer 2: Furniture objects (desks, chairs, decorations)
-    if (this.tileMap) {
-      this.tileMap.renderObjects(ctx, cam);
+    // Pass 2: Wall-layer furniture (carpets, paintings — below characters)
+    if (this.objectRenderer) {
+      this.objectRenderer.renderWallLayer(ctx, cam);
     }
 
-    // Layer 3: Characters (sorted by y position for depth)
-    const sortedCharacters = Array.from(this.characters.values()).sort(
-      (a, b) => a.worldY - b.worldY
-    );
-    for (const character of sortedCharacters) {
-      character.render(ctx, cam);
+    // Pass 3: Depth-sorted mix of object-layer furniture + characters
+    if (this.objectRenderer) {
+      const objectFurniture = this.objectRenderer.getObjectLayerFurniture();
+      const characters = Array.from(this.characters.values());
+
+      // Build unified sort list
+      type Renderable = { sortY: number; kind: 'furniture' | 'character'; ref: FurnitureObject | Character };
+      const renderables: Renderable[] = [];
+
+      for (const f of objectFurniture) {
+        renderables.push({
+          sortY: this.objectRenderer.getSortY(f),
+          kind: 'furniture',
+          ref: f,
+        });
+      }
+      for (const c of characters) {
+        renderables.push({
+          sortY: c.worldY,
+          kind: 'character',
+          ref: c,
+        });
+      }
+
+      // Sort by Y ascending (back to front)
+      renderables.sort((a, b) => a.sortY - b.sortY);
+
+      for (const r of renderables) {
+        if (r.kind === 'furniture') {
+          this.objectRenderer.renderObject(ctx, cam, r.ref as FurnitureObject);
+        } else {
+          (r.ref as Character).render(ctx, cam);
+        }
+      }
+    } else {
+      // Fallback: characters only (no furniture renderer)
+      const sorted = Array.from(this.characters.values()).sort((a, b) => a.worldY - b.worldY);
+      for (const c of sorted) {
+        c.render(ctx, cam);
+      }
     }
   }
 

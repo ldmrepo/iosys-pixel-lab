@@ -24,9 +24,48 @@ export interface WSMessage {
 }
 
 export interface TileInfo {
-  type: 'floor' | 'wall' | 'desk' | 'chair' | 'decoration';
+  type: 'floor' | 'wall';
   walkable: boolean;
   spriteIndex: number;
+}
+
+// ─── Furniture Object Layer ───
+
+export interface SpriteRegion {
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
+}
+
+export interface ObjectSpriteRef {
+  sheetId: string;
+  region: SpriteRegion;
+}
+
+export type FurnitureType =
+  | 'desk' | 'chair' | 'sofa' | 'bookshelf' | 'cabinet'
+  | 'plant' | 'monitor' | 'lamp' | 'carpet' | 'painting'
+  | 'appliance' | 'whiteboard' | 'water-cooler' | 'window' | 'decoration';
+
+export interface FurnitureObject {
+  id: string;
+  type: FurnitureType;
+  tileX: number;
+  tileY: number;
+  widthTiles: number;
+  heightTiles: number;
+  walkableMask?: boolean[];
+  sprite: ObjectSpriteRef;
+  drawOffsetY?: number;
+  seatId?: string;
+  sortY?: number;
+  layer?: 'wall' | 'object';
+}
+
+export interface FurnitureSpriteSheet {
+  url: string;
+  name: string;
 }
 
 export interface Seat {
@@ -44,6 +83,7 @@ export interface OfficeLayout {
   height: number;
   tileSize: number;
   tiles: TileInfo[][];
+  furniture: FurnitureObject[];
   seats: Seat[];
 }
 
@@ -63,4 +103,5 @@ export interface CharacterSprite {
 export interface AssetManifest {
   tileSheet: { url: string; tileSize: number; columns: number };
   characters: Record<string, CharacterSprite>;
+  furnitureSheets?: Record<string, FurnitureSpriteSheet>;
 }

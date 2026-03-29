@@ -29,10 +29,21 @@ export class TileMap {
     this.invalidateCache();
   }
 
+  /** Computed walkability grid (floor + furniture masks). */
+  private walkGrid: boolean[][] | null = null;
+
+  /** Set precomputed walkability grid (from engine, includes furniture masks). */
+  setWalkGrid(grid: boolean[][]): void {
+    this.walkGrid = grid;
+  }
+
   /** Check if a tile coordinate is walkable. */
   isWalkable(tileX: number, tileY: number): boolean {
     if (tileX < 0 || tileX >= this.layout.width || tileY < 0 || tileY >= this.layout.height) {
       return false;
+    }
+    if (this.walkGrid) {
+      return this.walkGrid[tileY][tileX];
     }
     return this.layout.tiles[tileY][tileX].walkable;
   }
@@ -148,43 +159,6 @@ export class TileMap {
     }
   }
 
-  /**
-   * Render the furniture/object layer (desks, chairs, decorations) on top of floor.
-   * Separated from floor rendering for proper layering with characters.
-   */
-  renderObjects(ctx: CanvasRenderingContext2D, camera: Camera): void {
-    const ts = this.layout.tileSize;
-    const visible = camera.getVisibleRect();
-
-    const startCol = Math.max(0, Math.floor(visible.left / ts));
-    const endCol = Math.min(this.layout.width - 1, Math.ceil(visible.right / ts));
-    const startRow = Math.max(0, Math.floor(visible.top / ts));
-    const endRow = Math.min(this.layout.height - 1, Math.ceil(visible.bottom / ts));
-
-    for (let row = startRow; row <= endRow; row++) {
-      for (let col = startCol; col <= endCol; col++) {
-        const tile = this.layout.tiles[row][col];
-        // Only render non-floor, non-wall tiles in the object layer
-        if (tile.type === 'floor' || tile.type === 'wall') continue;
-
-        const worldX = col * ts;
-        const worldY = row * ts;
-        const screen = camera.worldToScreen(worldX, worldY);
-
-        if (this.spriteSheet.isLoaded) {
-          this.spriteSheet.drawFrame(
-            ctx,
-            tile.spriteIndex,
-            screen.x,
-            screen.y,
-            camera.zoom
-          );
-        }
-        // Fallback colors are already drawn in the main render pass
-      }
-    }
-  }
-
   /** Invalidate the offscreen cache (call when layout changes). */
   invalidateCache(): void {
     this.cacheValid = false;
@@ -198,12 +172,6 @@ export class TileMap {
         return '#e8dcc8';
       case 'wall':
         return '#8b7355';
-      case 'desk':
-        return '#a0522d';
-      case 'chair':
-        return '#6b8e23';
-      case 'decoration':
-        return '#4682b4';
       default:
         return '#cccccc';
     }
