@@ -1,0 +1,306 @@
+import { EventEmitter } from 'events';
+import type { AgentState, AgentStatus, AgentEvent, Seat } from '../shared/types.js';
+import { SessionDiscovery, type DiscoveredSession } from './session-discovery.js';
+
+// Timeout thresholds (ms)
+const WAITING_TIMEOUT = 30_000;  // 30s after last assistant message -> waiting
+const IDLE_TIMEOUT = 60_000;     // 60s -> idle
+const DONE_TIMEOUT = 5 * 60_000; // 5m file unchanged -> done
+
+// Default fallback seats when office-layout is not available
+const DEFAULT_SEATS: Seat[] = Array.from({ length: 12 }, (_, i) => ({
+  id: `seat-${i}`,
+  tileX: 2 + (i % 4) * 3,
+  tileY: 2 + Math.floor(i / 4) * 3,
+  deskTileX: 2 + (i % 4) * 3,
+  deskTileY: 1 + Math.floor(i / 4) * 3,
+  facing: 'down' as const,
+}));
+
+/**
+ * Manages agent states based on incoming AgentEvents.
+ * Emits 'agent-update', 'agent-added', 'agent-removed' events.
+ */
+export class AgentStateMachine extends EventEmitter {
+  private agents: Map<string, AgentState> = new Map();
+  private seats: Seat[] = [...DEFAULT_SEATS];
+  private seatAssignments: Map<string, string> = new Map(); // agentId -> seatId
+  private agentCounter = 0;
+  private timeoutCheckInterval: ReturnType<typeof setInterval> | null = null;
+
+  constructor() {
+    super();
+    this.loadOfficeLayout();
+  }
+
+  /**
+   * Try to load seats from the shared office-layout module.
+   * Falls back to DEFAULT_SEATS if not available.
+   */
+  private async loadOfficeLayout(): Promise<void> {
+    try {
+      // Dynamic import -- the module may not exist yet
+      const layout = await import('../shared/office-layout.js') as Record<string, unknown>;
+      const officeLayout = (layout as { officeLayout?: { seats?: Seat[] } }).officeLayout;
+      const defaultExport = (layout as { default?: { seats?: Seat[] } }).default;
+
+      if (officeLayout?.seats && officeLayout.seats.length > 0) {
+        this.seats = officeLayout.seats;
+        console.log(`[StateMachine] Loaded ${this.seats.length} seats from office-layout`);
+      } else if (defaultExport?.seats && defaultExport.seats.length > 0) {
+        this.seats = defaultExport.seats;
+        console.log(`[StateMachine] Loaded ${this.seats.length} seats from office-layout (default export)`);
+      }
+    } catch {
+      console.log('[StateMachine] office-layout not available, using default seats');
+    }
+  }
+
+  start(): void {
+    // Check for timed-out agents every 5 seconds
+    this.timeoutCheckInterval = setInterval(() => this.checkTimeouts(), 5000);
+  }
+
+  stop(): void {
+    if (this.timeoutCheckInterval) {
+      clearInterval(this.timeoutCheckInterval);
+      this.timeoutCheckInterval = null;
+    }
+  }
+
+  /**
+   * Process an incoming agent event and update state accordingly.
+   */
+  processEvent(event: AgentEvent): void {
+    let agent = this.getAgentBySessionId(event.sessionId);
+
+    if (!agent) {
+      // Create new agent for this session
+      agent = this.createAgent(event.sessionId);
+    }
+
+    const previousStatus = agent.status;
+    const newStatus = this.deriveStatus(event);
+
+    agent.status = newStatus;
+    agent.lastAction = event.content;
+    agent.lastUpdated = event.timestamp;
+
+    if (previousStatus !== newStatus) {
+      this.emit('agent-update', { ...agent });
+    }
+  }
+
+  /**
+   * Called by session-discovery when a new session appears.
+   * Creates the agent proactively.
+   */
+  onSessionAdded(session: DiscoveredSession): void {
+    let agent = this.getAgentBySessionId(session.sessionId);
+    if (!agent) {
+      agent = this.createAgent(session.sessionId, session.projectHash);
+      // New agents start in idle until we see activity
+    }
+  }
+
+  /**
+   * Called by session-discovery when a session is removed.
+   */
+  onSessionRemoved(session: DiscoveredSession): void {
+    const agent = this.getAgentBySessionId(session.sessionId);
+    if (agent) {
+      agent.status = 'done';
+      this.emit('agent-update', { ...agent });
+
+      // Remove after emitting the done status
+      setTimeout(() => {
+        this.removeAgent(agent.id);
+      }, 2000);
+    }
+  }
+
+  getAgents(): AgentState[] {
+    return Array.from(this.agents.values()).map(a => ({ ...a }));
+  }
+
+  getAgentBySessionId(sessionId: string): AgentState | undefined {
+    for (const agent of this.agents.values()) {
+      if (agent.sessionId === sessionId) return agent;
+    }
+    return undefined;
+  }
+
+  /**
+   * Derive the appropriate AgentStatus from an event.
+   */
+  private deriveStatus(event: AgentEvent): AgentStatus {
+    const { type } = event;
+
+    // tool_use events
+    if (type.startsWith('tool_use:')) {
+      const toolName = type.replace('tool_use:', '');
+
+      switch (toolName) {
+        case 'Write':
+        case 'Edit':
+          return 'typing';
+
+        case 'Read':
+        case 'Glob':
+        case 'Grep':
+          return 'reading';
+
+        case 'Bash':
+        case 'Agent':
+          return 'executing';
+
+        default:
+          // Unknown tools default to executing
+          return 'executing';
+      }
+    }
+
+    // Assistant text output
+    if (type === 'assistant_text') {
+      return 'typing';
+    }
+
+    // User message means assistant is now waiting for user
+    if (type === 'user') {
+      return 'waiting';
+    }
+
+    // Tool results mean we're still working
+    if (type === 'tool_result') {
+      return 'executing';
+    }
+
+    return 'idle';
+  }
+
+  /**
+   * Create a new agent for the given session.
+   */
+  private createAgent(sessionId: string, projectPath?: string): AgentState {
+    this.agentCounter++;
+    const projectName = projectPath
+      ? SessionDiscovery.projectNameFromPath(projectPath)
+      : this.extractProjectNameFromSessionId(sessionId);
+
+    const agentId = `agent-${this.agentCounter}`;
+    const seat = this.assignSeat(agentId);
+
+    const agent: AgentState = {
+      id: agentId,
+      name: `Claude-${abbreviate(projectName)}-${this.agentCounter}`,
+      sessionId,
+      status: 'idle',
+      lastAction: '',
+      lastUpdated: Date.now(),
+      position: seat
+        ? { x: seat.tileX, y: seat.tileY }
+        : { x: 2 + (this.agentCounter % 6) * 2, y: 2 + Math.floor(this.agentCounter / 6) * 2 },
+    };
+
+    this.agents.set(agentId, agent);
+    this.emit('agent-added', { ...agent });
+    console.log(`[StateMachine] Agent created: ${agent.name} (${sessionId})`);
+
+    return agent;
+  }
+
+  private removeAgent(agentId: string): void {
+    const agent = this.agents.get(agentId);
+    if (!agent) return;
+
+    this.releaseSeat(agentId);
+    this.agents.delete(agentId);
+    this.emit('agent-removed', { ...agent });
+    console.log(`[StateMachine] Agent removed: ${agent.name}`);
+  }
+
+  /**
+   * Assign the first available seat to an agent.
+   */
+  private assignSeat(agentId: string): Seat | null {
+    const assignedSeatIds = new Set(this.seatAssignments.values());
+
+    for (const seat of this.seats) {
+      if (!assignedSeatIds.has(seat.id)) {
+        this.seatAssignments.set(agentId, seat.id);
+        seat.assignedAgentId = agentId;
+        return seat;
+      }
+    }
+
+    return null; // No seats available
+  }
+
+  private releaseSeat(agentId: string): void {
+    const seatId = this.seatAssignments.get(agentId);
+    if (!seatId) return;
+
+    this.seatAssignments.delete(agentId);
+    const seat = this.seats.find(s => s.id === seatId);
+    if (seat) {
+      seat.assignedAgentId = undefined;
+    }
+  }
+
+  /**
+   * Check all agents for timeout-based state transitions.
+   */
+  private checkTimeouts(): void {
+    const now = Date.now();
+
+    for (const agent of this.agents.values()) {
+      if (agent.status === 'done') continue;
+
+      const elapsed = now - agent.lastUpdated;
+      let newStatus: AgentStatus | null = null;
+
+      if (elapsed >= DONE_TIMEOUT) {
+        newStatus = 'done';
+      } else if (elapsed >= IDLE_TIMEOUT && agent.status !== 'idle' && agent.status !== 'waiting') {
+        newStatus = 'idle';
+      } else if (elapsed >= WAITING_TIMEOUT && (agent.status === 'typing' || agent.status === 'reading' || agent.status === 'executing')) {
+        newStatus = 'waiting';
+      }
+
+      if (newStatus && newStatus !== agent.status) {
+        agent.status = newStatus;
+        this.emit('agent-update', { ...agent });
+      }
+    }
+  }
+
+  /**
+   * Try to guess project name from context when no project path is available.
+   */
+  private extractProjectNameFromSessionId(_sessionId: string): string {
+    return 'unknown';
+  }
+}
+
+/**
+ * Create a short abbreviation from a project name.
+ * e.g. "iosys-pixel-lab" -> "PxLab", "my-cool-project" -> "MyCool"
+ */
+function abbreviate(name: string): string {
+  const parts = name.split(/[-_]/);
+  if (parts.length === 1) {
+    // Single word: capitalize and take first 6 chars
+    return capitalize(name).slice(0, 6);
+  }
+  // Multi-word: take first letter of each, capitalize, max 8 chars
+  const abbr = parts
+    .map(p => capitalize(p))
+    .join('')
+    .slice(0, 8);
+  return abbr;
+}
+
+function capitalize(s: string): string {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
