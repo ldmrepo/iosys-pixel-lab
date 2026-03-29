@@ -10,7 +10,7 @@
     "dev:server": "tsx watch src/server/index.ts",
     "dev:client": "vite --port 5173",
     "build": "tsc && vite build",
-    "generate:assets": "tsx scripts/composite-characters.ts",
+    "generate:characters": "tsx scripts/composite-characters.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
