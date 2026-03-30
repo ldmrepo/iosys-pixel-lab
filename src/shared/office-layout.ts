@@ -119,16 +119,16 @@ if (tiles.length !== 24 || tiles[0].length !== 30) {
 // All coordinates verified against actual sprite sheet images.
 // Phase 1: 91 entries preserved exactly as-is
 const SPRITES = {
-  // Desks — Kitchen1-Sheet (chairs row 0, desks/counters further right)
-  DESK_TOP:     { sheetId: 'kitchen1', region: { sx: 256, sy: 0, sw: 80, sh: 48 } },
-  DESK_BOT:     { sheetId: 'kitchen1', region: { sx: 336, sy: 0, sw: 80, sh: 48 } },
-  // Chairs — Kitchen1: 4 small chairs at left, ~16-32px each
-  CHAIR_UP:     { sheetId: 'kitchen1', region: { sx: 0,  sy: 0, sw: 16, sh: 32 } },
-  CHAIR_LEFT:   { sheetId: 'kitchen1', region: { sx: 16, sy: 0, sw: 16, sh: 32 } },
-  CHAIR_DOWN:   { sheetId: 'kitchen1', region: { sx: 32, sy: 0, sw: 16, sh: 32 } },
-  CHAIR_RIGHT:  { sheetId: 'kitchen1', region: { sx: 48, sy: 0, sw: 16, sh: 32 } },
-  // Monitor / TV
-  MONITOR:      { sheetId: 'tv',       region: { sx: 16,  sy: 0, sw: 32, sh: 32 } },
+  // Desks — Kitchen1-Sheet (96x96 cells, one per column)
+  DESK_TOP:     { sheetId: 'kitchen1', region: { sx: 384, sy: 0, sw: 96, sh: 96 } },
+  DESK_BOT:     { sheetId: 'kitchen1', region: { sx: 480, sy: 0, sw: 96, sh: 96 } },
+  // Chairs — Kitchen1: 96x96 cells, one per column
+  CHAIR_UP:     { sheetId: 'kitchen1', region: { sx:   0, sy: 0, sw: 96, sh: 96 } },
+  CHAIR_LEFT:   { sheetId: 'kitchen1', region: { sx: 192, sy: 0, sw: 96, sh: 96 } },
+  CHAIR_DOWN:   { sheetId: 'kitchen1', region: { sx:  96, sy: 0, sw: 96, sh: 96 } },
+  CHAIR_RIGHT:  { sheetId: 'kitchen1', region: { sx: 288, sy: 0, sw: 96, sh: 96 } },
+  // Monitor / TV — 64x96 cell
+  MONITOR:      { sheetId: 'tv',       region: { sx: 128, sy: 0, sw: 64, sh: 96 } },
   // Sofa — LivingRoom1: first row is blue sofa-front (80x48)
   SOFA_FRONT:   { sheetId: 'livingRoom1', region: { sx: 0,   sy: 0,   sw: 80, sh: 48 } },
   SOFA_BACK:    { sheetId: 'livingRoom1', region: { sx: 0,   sy: 96,  sw: 80, sh: 48 } },
@@ -144,12 +144,12 @@ const SPRITES = {
   PAINTING_2:   { sheetId: 'paintings', region: { sx: 64, sy: 0, sw: 32, sh: 32 } },
   // Water cooler — Hospital misc
   WATER_COOLER: { sheetId: 'miscHospital', region: { sx: 816, sy: 0, sw: 32, sh: 64 } },
-  // Lamps — Lights-Sheet: white lamp at 0, brown at 64
-  LAMP:         { sheetId: 'lights', region: { sx:  0, sy: 0, sw: 32, sh: 32 } },
-  LAMP_BROWN:   { sheetId: 'lights', region: { sx: 64, sy: 0, sw: 32, sh: 32 } },
-  // Windows — Windows-Sheet: horizontal strip, 48px wide each, wood at 0, blue-tint at 96
-  WINDOW_WOOD:  { sheetId: 'windows', region: { sx:  0, sy: 0, sw: 48, sh: 48 } },
-  WINDOW_BLUE:  { sheetId: 'windows', region: { sx: 96, sy: 0, sw: 48, sh: 48 } },
+  // Lamps — Lights-Sheet: 64x64 cells
+  LAMP:         { sheetId: 'lights', region: { sx:  0, sy: 0, sw: 64, sh: 64 } },
+  LAMP_BROWN:   { sheetId: 'lights', region: { sx: 64, sy: 0, sw: 64, sh: 64 } },
+  // Windows — Windows-Sheet: 64x64 cells
+  WINDOW_WOOD:  { sheetId: 'windows', region: { sx:   0, sy: 0, sw: 64, sh: 64 } },
+  WINDOW_BLUE:  { sheetId: 'windows', region: { sx: 256, sy: 0, sw: 64, sh: 64 } },
   // Door — Doors-Sheet: glass-pane door is index 2 (sx≈160), solid wood sx≈240
   DOOR:         { sheetId: 'doors', region: { sx: 160, sy: 0, sw: 64, sh: 80 } },
 
@@ -246,12 +246,12 @@ const SPRITES = {
   SOFA_BLUE_FRONT:  { sheetId: 'livingRoom1', region: { sx: 0, sy: 0,   sw: 80, sh: 48 } },
 
   // Kitchen items (Kitchen-Sheet 1152x96, items at 96px intervals)
-  KITCHEN_FRIDGE:   { sheetId: 'kitchen', region: { sx:  96, sy: 0, sw: 96, sh: 96 } },
-  KITCHEN_COUNTER:  { sheetId: 'kitchen', region: { sx:   0, sy: 0, sw: 96, sh: 96 } },
+  KITCHEN_FRIDGE:   { sheetId: 'kitchen', region: { sx: 672, sy: 0, sw: 96, sh: 96 } },
+  KITCHEN_COUNTER:  { sheetId: 'kitchen', region: { sx:  96, sy: 0, sw: 96, sh: 96 } },
   KITCHEN_SINK:     { sheetId: 'kitchen', region: { sx: 288, sy: 0, sw: 96, sh: 96 } },
 
-  // Large TV for meeting room (TV-Sheet 256x96)
-  TV_LARGE:         { sheetId: 'tv', region: { sx: 128, sy: 0, sw: 128, sh: 96 } },
+  // Large TV for meeting room (TV-Sheet 256x96, 64x96 cell)
+  TV_LARGE:         { sheetId: 'tv', region: { sx: 128, sy: 0, sw: 64, sh: 96 } },
 
   // Additional paintings (Paintings 320x32, Paintings1 160x32)
   PAINTING_3: { sheetId: 'paintings',  region: { sx: 128, sy: 0, sw: 32, sh: 32 } },
@@ -267,11 +267,11 @@ const SPRITES = {
   PLANT_POT:   { sheetId: 'flowers', region: { sx: 80, sy: 0, sw: 32, sh: 48 } },
 
   // Window variants (Windows-Sheet 896x64, 64px per window)
-  WINDOW_PURPLE: { sheetId: 'windows', region: { sx: 192, sy: 0, sw: 64, sh: 64 } },
-  WINDOW_WHITE:  { sheetId: 'windows', region: { sx: 288, sy: 0, sw: 64, sh: 64 } },
+  WINDOW_PURPLE: { sheetId: 'windows', region: { sx: 576, sy: 0, sw: 64, sh: 64 } },
+  WINDOW_WHITE:  { sheetId: 'windows', region: { sx: 384, sy: 0, sw: 64, sh: 64 } },
 
-  // Reception desk placeholder (Kitchen counter style)
-  RECEPTION_DESK: { sheetId: 'kitchen', region: { sx: 576, sy: 0, sw: 96, sh: 96 } },
+  // Reception desk (Kitchen-Sheet col8 = cabinet-counter)
+  RECEPTION_DESK: { sheetId: 'kitchen', region: { sx: 768, sy: 0, sw: 96, sh: 96 } },
 } as const;
 
 // ─── Furniture & Seats ──────────────────────────────────────
@@ -294,13 +294,13 @@ function createPod(sx: number, sy: number, prefix: string) {
       id: `desk-${prefix}-top-${i}`, type: 'desk',
       tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
       walkableMask: [false, false],
-      sprite: SPRITES.DESK_TOP, drawOffsetY: -16,
+      sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
     });
     furniture.push({
       id: `mon-${prefix}-top-${i}`, type: 'monitor',
       tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
       walkableMask: [false, false],
-      sprite: SPRITES.MONITOR, drawOffsetY: -8, sortY: -1,
+      sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
     });
     for (let c = 0; c < 2; c++) {
       const id = `s${seatId++}`;
@@ -308,7 +308,7 @@ function createPod(sx: number, sy: number, prefix: string) {
         id: `chair-${id}`, type: 'chair',
         tileX: dx + c, tileY: sy + 1, widthTiles: 1, heightTiles: 1,
         walkableMask: [true],
-        sprite: SPRITES.CHAIR_DOWN, seatId: id, drawOffsetY: -8,
+        sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
       });
       seats.push({ id, tileX: dx + c, tileY: sy + 1, deskTileX: dx, deskTileY: sy, facing: 'down' });
     }
@@ -319,13 +319,13 @@ function createPod(sx: number, sy: number, prefix: string) {
       id: `desk-${prefix}-bot-${i}`, type: 'desk',
       tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
       walkableMask: [false, false],
-      sprite: SPRITES.DESK_BOT, drawOffsetY: -16,
+      sprite: SPRITES.DESK_BOT, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
     });
     furniture.push({
       id: `mon-${prefix}-bot-${i}`, type: 'monitor',
       tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
       walkableMask: [false, false],
-      sprite: SPRITES.MONITOR, drawOffsetY: -8, sortY: -1,
+      sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
     });
     for (let c = 0; c < 2; c++) {
       const id = `s${seatId++}`;
@@ -333,7 +333,7 @@ function createPod(sx: number, sy: number, prefix: string) {
         id: `chair-${id}`, type: 'chair',
         tileX: dx + c, tileY: bdy - 1, widthTiles: 1, heightTiles: 1,
         walkableMask: [true],
-        sprite: SPRITES.CHAIR_UP, seatId: id, drawOffsetY: -8,
+        sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
       });
       seats.push({ id, tileX: dx + c, tileY: bdy - 1, deskTileX: dx, deskTileY: bdy, facing: 'up' });
     }
@@ -357,25 +357,25 @@ furniture.push({
   id: 'rack-0', type: 'server-rack',
   tileX: 1, tileY: 1, widthTiles: 4, heightTiles: 4,
   walkableMask: Array(16).fill(false),
-  sprite: SPRITES.SERVER_RACK_PURPLE, drawOffsetY: -48,
+  sprite: SPRITES.SERVER_RACK_PURPLE, renderWidth: 64, renderHeight: 64, drawOffsetY: 0,
 });
 furniture.push({
   id: 'rack-1', type: 'server-rack',
   tileX: 5, tileY: 1, widthTiles: 4, heightTiles: 4,
   walkableMask: Array(16).fill(false),
-  sprite: SPRITES.SERVER_RACK_BLUE, drawOffsetY: -48,
+  sprite: SPRITES.SERVER_RACK_BLUE, renderWidth: 64, renderHeight: 64, drawOffsetY: 0,
 });
 furniture.push({
   id: 'rack-2', type: 'server-rack',
   tileX: 1, tileY: 6, widthTiles: 4, heightTiles: 4,
   walkableMask: Array(16).fill(false),
-  sprite: SPRITES.SERVER_RACK_GREEN, drawOffsetY: -48,
+  sprite: SPRITES.SERVER_RACK_GREEN, renderWidth: 64, renderHeight: 64, drawOffsetY: 0,
 });
 furniture.push({
   id: 'rack-3', type: 'server-rack',
   tileX: 5, tileY: 6, widthTiles: 4, heightTiles: 4,
   walkableMask: Array(16).fill(false),
-  sprite: SPRITES.SERVER_RACK_CYAN, drawOffsetY: -48,
+  sprite: SPRITES.SERVER_RACK_CYAN, renderWidth: 64, renderHeight: 64, drawOffsetY: 0,
 });
 
 // Server monitoring equipment (R3.1: WATER_COOLER-based monitoring)
@@ -383,7 +383,7 @@ furniture.push({
   id: 'monitor-srv', type: 'water-cooler',
   tileX: 3, tileY: 5, widthTiles: 1, heightTiles: 2,
   walkableMask: [false, false],
-  sprite: SPRITES.WATER_COOLER, drawOffsetY: -16,
+  sprite: SPRITES.WATER_COOLER, renderWidth: 16, renderHeight: 32, drawOffsetY: 0,
 });
 
 // Server room lamp (R6.2 ambient lighting)
@@ -391,7 +391,7 @@ furniture.push({
   id: 'lamp-srv', type: 'lamp',
   tileX: 6, tileY: 5, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.LAMP, drawOffsetY: -24,
+  sprite: SPRITES.LAMP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 
 // ── Meeting Room (interior: x=16..21, y=11..15) ──
@@ -400,19 +400,19 @@ furniture.push({
   id: 'desk-mtg-0', type: 'desk',
   tileX: 16, tileY: 12, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DESK_TOP, drawOffsetY: -16,
+  sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'desk-mtg-1', type: 'desk',
   tileX: 18, tileY: 12, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DESK_TOP, drawOffsetY: -16,
+  sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'desk-mtg-2', type: 'desk',
   tileX: 20, tileY: 12, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DESK_TOP, drawOffsetY: -16,
+  sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
 });
 
 // Meeting chairs (6 chairs, 3 on each side — decoration only, not agent seats)
@@ -420,37 +420,37 @@ furniture.push({
   id: 'chair-mtg-n0', type: 'chair',
   tileX: 16, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'chair-mtg-n1', type: 'chair',
   tileX: 18, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'chair-mtg-n2', type: 'chair',
   tileX: 20, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'chair-mtg-s0', type: 'chair',
   tileX: 16, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'chair-mtg-s1', type: 'chair',
   tileX: 18, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'chair-mtg-s2', type: 'chair',
   tileX: 20, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, drawOffsetY: -8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 
 // Meeting room TV (wall-mounted on north partition wall row y=10)
@@ -458,7 +458,7 @@ furniture.push({
   id: 'tv-mtg', type: 'monitor',
   tileX: 18, tileY: 10, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.MONITOR, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, layer: 'wall', drawOffsetY: 0,
 });
 
 // Meeting room whiteboard (R3.3 — on west interior wall x=15)
@@ -466,7 +466,7 @@ furniture.push({
   id: 'whiteboard-mtg', type: 'whiteboard',
   tileX: 15, tileY: 13, widthTiles: 1, heightTiles: 2,
   walkableMask: [false, false],
-  sprite: SPRITES.MONITOR, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, layer: 'wall', drawOffsetY: 0,
 });
 
 // Meeting room carpet
@@ -474,7 +474,7 @@ furniture.push({
   id: 'carpet-mtg', type: 'carpet',
   tileX: 16, tileY: 11, widthTiles: 6, heightTiles: 5,
   walkableMask: Array(30).fill(true),
-  sprite: SPRITES.CARPET, layer: 'wall',
+  sprite: SPRITES.CARPET, renderWidth: 96, renderHeight: 80, layer: 'wall',
 });
 
 // Meeting room door (north doorway at x:18-19, y:10)
@@ -482,7 +482,7 @@ furniture.push({
   id: 'door-mtg-n', type: 'door',
   tileX: 18, tileY: 10, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DOOR, layer: 'wall', drawOffsetY: -64,
+  sprite: SPRITES.DOOR, renderWidth: 64, renderHeight: 80, layer: 'wall', drawOffsetY: 64,
 });
 
 // ── Lounge (ZONES.lounge: x=1..14, y=17..22) ──
@@ -491,7 +491,7 @@ furniture.push({
   id: 'carpet-lounge', type: 'carpet',
   tileX: 5, tileY: 18, widthTiles: 4, heightTiles: 4,
   walkableMask: Array(16).fill(true),
-  sprite: SPRITES.CARPET, layer: 'wall',
+  sprite: SPRITES.CARPET, renderWidth: 64, renderHeight: 64, layer: 'wall',
 });
 
 // Sofas (2 colored sofas, using 80x48 sprites)
@@ -499,13 +499,13 @@ furniture.push({
   id: 'sofa-lounge-green', type: 'sofa',
   tileX: 4, tileY: 17, widthTiles: 4, heightTiles: 1,
   walkableMask: [false, false, false, false],
-  sprite: SPRITES.SOFA_GREEN_FRONT, drawOffsetY: -16,
+  sprite: SPRITES.SOFA_GREEN_FRONT, renderWidth: 64, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'sofa-lounge-cyan', type: 'sofa',
   tileX: 4, tileY: 21, widthTiles: 4, heightTiles: 1,
   walkableMask: [false, false, false, false],
-  sprite: SPRITES.SOFA_CYAN_FRONT, drawOffsetY: -16,
+  sprite: SPRITES.SOFA_CYAN_FRONT, renderWidth: 64, renderHeight: 32, drawOffsetY: 16,
 });
 
 // Fireplace (chimney is 48x48 = 3x3 tiles, on west wall)
@@ -513,7 +513,7 @@ furniture.push({
   id: 'fireplace', type: 'fireplace',
   tileX: 1, tileY: 18, widthTiles: 3, heightTiles: 3,
   walkableMask: Array(9).fill(false),
-  sprite: SPRITES.CHIMNEY_0, drawOffsetY: -16,
+  sprite: SPRITES.CHIMNEY_0, renderWidth: 48, renderHeight: 48, drawOffsetY: 0,
 });
 
 // Coffee table
@@ -521,7 +521,7 @@ furniture.push({
   id: 'table-lounge', type: 'desk',
   tileX: 6, tileY: 19, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DESK_TOP, drawOffsetY: -16,
+  sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
 });
 
 // Lounge lamps (2)
@@ -529,13 +529,13 @@ furniture.push({
   id: 'lamp-lounge-L', type: 'lamp',
   tileX: 3, tileY: 19, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.LAMP, drawOffsetY: -24,
+  sprite: SPRITES.LAMP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'lamp-lounge-R', type: 'lamp',
   tileX: 11, tileY: 19, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.LAMP_BROWN, drawOffsetY: -24,
+  sprite: SPRITES.LAMP_BROWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 
 // ── Kitchenette (east utility: x=23..28, y=11..15) ──
@@ -543,19 +543,19 @@ furniture.push({
   id: 'fridge', type: 'appliance',
   tileX: 27, tileY: 11, widthTiles: 2, heightTiles: 3,
   walkableMask: Array(6).fill(false),
-  sprite: SPRITES.KITCHEN_FRIDGE, drawOffsetY: -48,
+  sprite: SPRITES.KITCHEN_FRIDGE, renderWidth: 32, renderHeight: 48, drawOffsetY: 0,
 });
 furniture.push({
   id: 'counter', type: 'appliance',
   tileX: 24, tileY: 11, widthTiles: 2, heightTiles: 3,
   walkableMask: Array(6).fill(false),
-  sprite: SPRITES.KITCHEN_COUNTER, drawOffsetY: -48,
+  sprite: SPRITES.KITCHEN_COUNTER, renderWidth: 32, renderHeight: 32, drawOffsetY: 0,
 });
 furniture.push({
   id: 'cooler', type: 'water-cooler',
   tileX: 26, tileY: 13, widthTiles: 1, heightTiles: 2,
   walkableMask: [false, false],
-  sprite: SPRITES.WATER_COOLER, drawOffsetY: -16,
+  sprite: SPRITES.WATER_COOLER, renderWidth: 16, renderHeight: 32, drawOffsetY: 0,
 });
 
 // ── Lobby (ZONES.lobby: x=15..28, y=17..22) ──
@@ -564,7 +564,7 @@ furniture.push({
   id: 'sofa-lobby', type: 'sofa',
   tileX: 20, tileY: 20, widthTiles: 4, heightTiles: 1,
   walkableMask: [false, false, false, false],
-  sprite: SPRITES.SOFA_FRONT, drawOffsetY: -16,
+  sprite: SPRITES.SOFA_FRONT, renderWidth: 64, renderHeight: 32, drawOffsetY: 16,
 });
 
 // Reception desk
@@ -572,7 +572,7 @@ furniture.push({
   id: 'reception', type: 'reception-desk',
   tileX: 19, tileY: 18, widthTiles: 2, heightTiles: 2,
   walkableMask: [false, false, false, false],
-  sprite: SPRITES.RECEPTION_DESK, drawOffsetY: -48,
+  sprite: SPRITES.RECEPTION_DESK, renderWidth: 32, renderHeight: 32, drawOffsetY: 0,
 });
 
 // Lobby glass front door (south wall at y=23)
@@ -580,7 +580,7 @@ furniture.push({
   id: 'door-lobby', type: 'door',
   tileX: 20, tileY: 23, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.DOOR_HOSP_DOUBLE, layer: 'wall', drawOffsetY: -64,
+  sprite: SPRITES.DOOR_HOSP_DOUBLE, renderWidth: 80, renderHeight: 80, layer: 'wall', drawOffsetY: 64,
 });
 
 // Lobby lamps (2)
@@ -588,13 +588,13 @@ furniture.push({
   id: 'lamp-lobby-L', type: 'lamp',
   tileX: 16, tileY: 18, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.LAMP, drawOffsetY: -24,
+  sprite: SPRITES.LAMP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 furniture.push({
   id: 'lamp-lobby-R', type: 'lamp',
   tileX: 27, tileY: 18, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.LAMP_BROWN, drawOffsetY: -24,
+  sprite: SPRITES.LAMP_BROWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
 });
 
 // Large lobby plants (2)
@@ -602,13 +602,13 @@ furniture.push({
   id: 'plant-lobby-L', type: 'plant',
   tileX: 15, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_LARGE, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_LARGE, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-lobby-R', type: 'plant',
   tileX: 28, tileY: 22, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_LARGE, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_LARGE, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 
 // ── Bookshelves in Work Zone A along north wall ──
@@ -616,13 +616,13 @@ furniture.push({
   id: 'shelf-workA-L', type: 'bookshelf',
   tileX: 9, tileY: 1, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.BOOKSHELF_L, drawOffsetY: -32,
+  sprite: SPRITES.BOOKSHELF_L, renderWidth: 32, renderHeight: 48, drawOffsetY: 32,
 });
 furniture.push({
   id: 'shelf-workA-R', type: 'bookshelf',
   tileX: 27, tileY: 1, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.BOOKSHELF_R, drawOffsetY: -32,
+  sprite: SPRITES.BOOKSHELF_R, renderWidth: 32, renderHeight: 48, drawOffsetY: 32,
 });
 
 // Verify all furniture has walkableMask
@@ -636,49 +636,49 @@ furniture.push({
   id: 'win-0', type: 'window',
   tileX: 2, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_WOOD, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_WOOD, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-1', type: 'window',
   tileX: 5, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_BLUE, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_BLUE, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-2', type: 'window',
   tileX: 10, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_WOOD, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_WOOD, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-3', type: 'window',
   tileX: 13, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_BLUE, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_BLUE, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-4', type: 'window',
   tileX: 16, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_PURPLE, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_PURPLE, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-5', type: 'window',
   tileX: 19, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_WOOD, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_WOOD, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-6', type: 'window',
   tileX: 22, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_BLUE, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_BLUE, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 furniture.push({
   id: 'win-7', type: 'window',
   tileX: 25, tileY: 0, widthTiles: 2, heightTiles: 1,
   walkableMask: [false, false],
-  sprite: SPRITES.WINDOW_WHITE, layer: 'wall', drawOffsetY: -16,
+  sprite: SPRITES.WINDOW_WHITE, renderWidth: 64, renderHeight: 48, layer: 'wall', drawOffsetY: 32,
 });
 
 // ── Wall paintings (R4.3: 8 paintings) ──
@@ -686,49 +686,49 @@ furniture.push({
   id: 'paint-0', type: 'painting',
   tileX: 3, tileY: 1, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_1, layer: 'wall',
+  sprite: SPRITES.PAINTING_1, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-1', type: 'painting',
   tileX: 12, tileY: 1, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_2, layer: 'wall',
+  sprite: SPRITES.PAINTING_2, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-2', type: 'painting',
   tileX: 20, tileY: 1, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_3, layer: 'wall',
+  sprite: SPRITES.PAINTING_3, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-3', type: 'painting',
   tileX: 3, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_4, layer: 'wall',
+  sprite: SPRITES.PAINTING_4, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-4', type: 'painting',
   tileX: 8, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_5, layer: 'wall',
+  sprite: SPRITES.PAINTING_5, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-5', type: 'painting',
   tileX: 16, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_6, layer: 'wall',
+  sprite: SPRITES.PAINTING_6, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-6', type: 'painting',
   tileX: 23, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_7, layer: 'wall',
+  sprite: SPRITES.PAINTING_7, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 furniture.push({
   id: 'paint-7', type: 'painting',
   tileX: 26, tileY: 1, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PAINTING_8, layer: 'wall',
+  sprite: SPRITES.PAINTING_8, renderWidth: 32, renderHeight: 32, layer: 'wall', drawOffsetY: 16,
 });
 
 // ── Plants (R4.4 + R6.1: 12 plants) ──
@@ -736,73 +736,73 @@ furniture.push({
   id: 'plant-0', type: 'plant',
   tileX: 9, tileY: 9, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-1', type: 'plant',
   tileX: 28, tileY: 1, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_SMALL, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_SMALL, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-2', type: 'plant',
   tileX: 1, tileY: 9, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_LARGE, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_LARGE, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-3', type: 'plant',
   tileX: 9, tileY: 10, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-4', type: 'plant',
   tileX: 14, tileY: 10, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_POT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_POT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-5', type: 'plant',
   tileX: 1, tileY: 16, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-6', type: 'plant',
   tileX: 14, tileY: 16, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_LARGE, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_LARGE, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-7', type: 'plant',
   tileX: 1, tileY: 22, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_SMALL, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_SMALL, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-8', type: 'plant',
   tileX: 14, tileY: 22, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-9', type: 'plant',
   tileX: 19, tileY: 22, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_POT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_POT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-10', type: 'plant',
   tileX: 23, tileY: 22, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT_LARGE, drawOffsetY: -32,
+  sprite: SPRITES.PLANT_LARGE, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 furniture.push({
   id: 'plant-11', type: 'plant',
   tileX: 28, tileY: 17, widthTiles: 1, heightTiles: 1,
   walkableMask: [false],
-  sprite: SPRITES.PLANT, drawOffsetY: -32,
+  sprite: SPRITES.PLANT, renderWidth: 16, renderHeight: 32, drawOffsetY: 16,
 });
 
 // ─── Export ──────────────────────────────────────────────────
