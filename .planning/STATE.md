@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
 status: executing
-stopped_at: Completed 09-01-PLAN.md — speech bubble system with click dismiss
-last_updated: "2026-03-30T15:31:24.211Z"
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-30T15:32:24.430Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 40
 ---
 
@@ -50,6 +50,8 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 08-state-detection]: backgroundAgentIds stored inside AgentTimers per-agent — cleanup via Map.delete is automatic on removeAgent
 - [Phase 09-01]: permissionPending bubble bounces; waiting is static for clean fade; bubbleHitTest uses non-bounced position for stable click area
 - [Phase 09-01]: agentClickCallbacks.length guard moved after bubble check — bubbles dismiss even with no click listeners registered
+- [Phase 09-visual-feedback]: ChimeSound lazy AudioContext on first play() call (browser autoplay policy compliance)
+- [Phase 09-visual-feedback]: muted setter inverted localStorage: stored 'false' means muted so default (missing key) = sound enabled
 
 ## Accumulated Context (from v1.0)
 
@@ -66,5 +68,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Completed 09-01-PLAN.md — speech bubble system with click dismiss
+Stopped at: Completed 09-02-PLAN.md
 Resume: `/gsd:plan-phase 8`

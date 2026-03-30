@@ -30,8 +30,8 @@ Requirements for Dynamic Agents milestone. Each maps to roadmap phases.
 - [x] **VISUAL-01**: Permission 말풍선이 도구 권한 대기 시 캐릭터 위에 표시된다 (호박색 "...")
 - [x] **VISUAL-02**: Waiting 말풍선이 턴 종료 시 표시되고 2초 후 페이드아웃된다 (녹색 체크마크)
 - [x] **VISUAL-03**: 말풍선 클릭으로 즉시 닫을 수 있다
-- [ ] **VISUAL-04**: 턴 종료 시 2음 차임 사운드가 재생된다 (E5→E6, Web Audio API)
-- [ ] **VISUAL-05**: 사운드 on/off 토글이 가능하다
+- [x] **VISUAL-04**: 턴 종료 시 2음 차임 사운드가 재생된다 (E5→E6, Web Audio API)
+- [x] **VISUAL-05**: 사운드 on/off 토글이 가능하다
 
 ### Sub-Agents
 
@@ -86,8 +86,8 @@ Deferred to future release.
 | VISUAL-01 | Phase 9 | Complete |
 | VISUAL-02 | Phase 9 | Complete |
 | VISUAL-03 | Phase 9 | Complete |
-| VISUAL-04 | Phase 9 | Pending |
-| VISUAL-05 | Phase 9 | Pending |
+| VISUAL-04 | Phase 9 | Complete |
+| VISUAL-05 | Phase 9 | Complete |
 | SUB-01 | Phase 10 | Pending |
 | SUB-02 | Phase 10 | Pending |
 | SUB-03 | Phase 10 | Pending |
