@@ -374,6 +374,7 @@ export class AgentStateMachine extends EventEmitter {
       status: 'idle',
       lastAction: '',
       lastUpdated: Date.now(),
+      createdAt: Date.now(),
       permissionPending: false,
       position: seat
         ? { x: seat.tileX, y: seat.tileY }
@@ -422,6 +423,7 @@ export class AgentStateMachine extends EventEmitter {
       status: 'executing',
       lastAction: `Sub-agent: ${toolName}`,
       lastUpdated: Date.now(),
+      createdAt: Date.now(),
       position: { ...parentAgent.position },  // Engine will reposition to nearest walkable
       permissionPending: false,
       parentId: parentAgent.id,

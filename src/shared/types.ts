@@ -18,6 +18,7 @@ export interface AgentState {
   status: AgentStatus;
   lastAction: string;
   lastUpdated: number;
+  createdAt: number;            // timestamp when agent was created (never changes)
   position: { x: number; y: number };
   permissionPending: boolean;   // true when waiting for tool permission (7s timeout)
   parentId?: string;            // set for sub-agents — references the parent agent's id
