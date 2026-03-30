@@ -126,7 +126,11 @@ Plans:
   2. 병렬 도구 호출 시 같은 message.id가 여러 번 집계되지 않는다 (중복 카운팅 없음)
   3. 각 에이전트 카드에 세션 누적 예상 비용(USD)이 표시된다
   4. 브라우저 재접속 후에도 토큰 누적값이 유지된다 (서버 상태 기반)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — TokenUsage type + pricing module + parser usage extraction + state-machine accumulation with dedup
+- [ ] 12-02-PLAN.md — AgentPanel token/cost display replacing placeholder + visual verification
 
 ### Phase 13: Asset Replacement
 **Goal**: PixelOffice와 Pixel Life 에셋팩의 스프라이트 좌표를 측정·등록하고 오피스 가구를 새 에셋으로 교체하되 기존 엔진이 정상 동작함을 검증한다
@@ -158,5 +162,5 @@ Phases execute in this order: 11 → 12 → 13
 | 9. Visual Feedback | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 11. Layout & Dashboard Panel | v1.2 | Complete    | 2026-03-30 | 2026-03-30 |
-| 12. Token & Cost Tracking | v1.2 | 0/? | Not started | - |
+| 12. Token & Cost Tracking | v1.2 | 0/2 | Not started | - |
 | 13. Asset Replacement | v1.2 | 0/? | Not started | - |
