@@ -77,7 +77,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 03-01-PLAN.md — 6존 컬러 시스템 교체 + walkableMask 검증 + 카메라 확인
+- [x] 03-01-PLAN.md — 6존 컬러 시스템 교체 + walkableMask 검증 + 카메라 확인
 
 **Files**:
 - `src/engine/TileMap.ts` — 존 컬러 시스템 리팩터
@@ -96,20 +96,24 @@ Plans:
 
 ## Phase 4: ObjectRenderer & Sprites
 
-**Goal**: 신규 가구 타입이 정상 렌더링되도록 ObjectRenderer 확장
+**Goal**: 17개 SPRITES region 좌표 교정 + renderWidth/renderHeight 엔진 확장 + 전체 가구 렌더링 크기/오프셋 보정
 **Requirements**: R5.3
+**Plans:** 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md — Engine renderWidth/renderHeight fix + 17 SPRITES corrections + 72 furniture sizing + visual verification
 
 **Files**:
-- `src/engine/ObjectRenderer.ts` — 신규 시트 로딩, region 렌더링
-- `src/engine/SpriteSheet.ts` — (필요시) region 기반 드로잉 개선
+- `src/shared/types.ts` — FurnitureObject에 renderWidth/renderHeight 추가
+- `src/engine/ObjectRenderer.ts` — renderObject/isVisible에서 renderWidth/renderHeight 사용
+- `src/shared/office-layout.ts` — SPRITES region 교정 + 전체 가구 renderWidth/renderHeight/drawOffsetY
 
 **Tasks**:
-1. ObjectRenderer가 신규 furnitureSheets를 로드하도록 확장
-2. 서버랙(Beds1) 스프라이트 렌더링 검증 — 네온 글로우가 올바르게 표시되는지
-3. 유리문(DoorsHospital) 렌더링 검증
-4. 벽난로(Chimney) 렌더링 검증
-5. 전체 가구 스프라이트 좌표(region) 실제 이미지와 대조 검증
-6. drawOffsetY 값 각 가구 타입별 보정
+1. FurnitureObject 타입에 renderWidth?/renderHeight? 필드 추가
+2. ObjectRenderer.renderObject()와 isVisible()에서 renderWidth/renderHeight 사용
+3. 17개 SPRITES region 좌표 교정 (Kitchen1, TV, Kitchen, Windows, Lights)
+4. 72개 가구 객체에 renderWidth/renderHeight 추가 및 drawOffsetY 부호 교정
+5. 시각적 검증 (인간 확인)
 
 **Success**: 모든 가구가 올바른 위치/크기로 렌더링, 깨지는 스프라이트 없음
 
