@@ -89,9 +89,9 @@ export class ObjectRenderer {
     // Convert to screen coordinates
     const screenPos = camera.worldToScreen(worldX, worldY);
 
-    // Scale sprite dimensions by current zoom
-    const drawWidth = sw * camera.zoom;
-    const drawHeight = sh * camera.zoom;
+    // Scale sprite dimensions by current zoom; use explicit render size when provided
+    const drawWidth = (obj.renderWidth ?? sw) * camera.zoom;
+    const drawHeight = (obj.renderHeight ?? sh) * camera.zoom;
 
     ctx.drawImage(
       sheet,
@@ -126,13 +126,14 @@ export class ObjectRenderer {
    * so they can be skipped during rendering.
    */
   private isVisible(obj: FurnitureObject, camera: Camera): boolean {
-    const { sw, sh } = obj.sprite.region;
+    const rw = obj.renderWidth ?? obj.sprite.region.sw;
+    const rh = obj.renderHeight ?? obj.sprite.region.sh;
 
     // Bounding box in world coordinates
     const objLeft = obj.tileX * this.tileSize;
     const objTop = obj.tileY * this.tileSize - (obj.drawOffsetY ?? 0);
-    const objRight = objLeft + sw;
-    const objBottom = objTop + sh;
+    const objRight = objLeft + rw;
+    const objBottom = objTop + rh;
 
     const visible = camera.getVisibleRect();
 

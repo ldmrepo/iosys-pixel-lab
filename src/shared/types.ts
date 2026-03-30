@@ -73,6 +73,8 @@ export interface FurnitureObject {
   walkableMask?: boolean[];
   sprite: ObjectSpriteRef;
   drawOffsetY?: number;
+  renderWidth?: number;   // display width in world pixels (overrides sprite region sw)
+  renderHeight?: number;  // display height in world pixels (overrides sprite region sh)
   seatId?: string;
   sortY?: number;
   layer?: 'wall' | 'object';
