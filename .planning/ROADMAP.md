@@ -107,11 +107,11 @@ Plans:
   3. 말풍선을 클릭하면 즉시 닫힌다
   4. 턴 종료 시 E5→E6 2음 차임이 Web Audio API로 재생된다
   5. 화면 상단 사운드 토글 버튼으로 차임 on/off를 전환할 수 있고 설정이 유지된다
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: Canvas 말풍선 렌더러 (permission + waiting + 클릭 dismiss)
-- [ ] 09-02: Web Audio 차임 + 사운드 토글 UI
+- [ ] 09-01-PLAN.md — Pixel-art speech bubble renderer (permission amber "..." + waiting green checkmark + fade-out + click dismiss)
+- [ ] 09-02-PLAN.md — Web Audio E5-E6 chime + SoundToggle React component + localStorage persistence
 
 ### Phase 10: Sub-Agents
 **Goal**: Task/Agent 도구 실행 시 서브에이전트 캐릭터가 부모 근처에 스폰되고 작업 완료 시 Matrix 이펙트와 함께 디스폰된다
