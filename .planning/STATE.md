@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: planning
-stopped_at: Phase 6 planned — 2 plans in 2 waves ready for execution
-last_updated: "2026-03-30T13:33:15.101Z"
+status: executing
+stopped_at: Completed 06-01-PLAN.md — 4-direction walk sprites + direction tracking
+last_updated: "2026-03-30T13:42:08.249Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -18,7 +18,7 @@ progress:
 ## Current Phase
 
 **Phase 6 of 10** (v1.1) — Movement Engine
-**Status:** Ready to plan
+**Status:** Executing Phase 06
 
 ## Phase Status
 
@@ -38,6 +38,8 @@ Progress: [░░░░░░░░░░] 0% (0/10 plans)
 - 대시보드 UI 제외 (v2 이후)
 - Phase 8 (State Detection)은 Phase 7과 독립적 — 병렬 착수 가능
 - Phase 10 (Sub-Agents)은 Phase 6 + Phase 8 모두 완료 필요
+- [Phase 06-movement-engine]: Used MetroCity native left-direction sprites instead of horizontal-flip: drawFrameFlipped not needed in SpriteSheet.ts
+- [Phase 06-movement-engine]: walk_* variants added directly to AgentStatus union so all Record<AgentStatus,...> maps remain exhaustive at compile time
 
 ## Accumulated Context (from v1.0)
 
@@ -54,5 +56,5 @@ Progress: [░░░░░░░░░░] 0% (0/10 plans)
 
 ## Last Session
 
-Stopped at: Phase 6 planned — 2 plans in 2 waves ready for execution
+Stopped at: Completed 06-01-PLAN.md — 4-direction walk sprites + direction tracking
 Resume: `/gsd:plan-phase 6`

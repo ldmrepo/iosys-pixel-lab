@@ -9,7 +9,7 @@ Requirements for Dynamic Agents milestone. Each maps to roadmap phases.
 
 ### Character Movement
 
-- [ ] **MOVE-01**: 캐릭터가 idle/walk/type 3상태 FSM으로 동작한다
+- [x] **MOVE-01**: 캐릭터가 idle/walk/type 3상태 FSM으로 동작한다
 - [ ] **MOVE-02**: 캐릭터가 BFS 경로탐색으로 타일 간 이동한다 (4방향, 장애물 회피)
 - [ ] **MOVE-03**: 에이전트 활성화 시 캐릭터가 배정된 좌석으로 걸어간다
 - [ ] **MOVE-04**: 에이전트 비활성 시 캐릭터가 사무실을 랜덤 배회한다 (2~20초 대기 → 이동 → 좌석 복귀)
@@ -71,7 +71,7 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MOVE-01 | Phase 6 | Pending |
+| MOVE-01 | Phase 6 | Complete |
 | MOVE-02 | Phase 6 | Pending |
 | MOVE-07 | Phase 6 | Pending |
 | MOVE-03 | Phase 7 | Pending |

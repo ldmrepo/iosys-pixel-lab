@@ -143,7 +143,7 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 3. TileMap Engine Adaptation | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 4. ObjectRenderer & Sprites | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
-| 6. Movement Engine | v1.1 | 0/2 | Planning complete | - |
+| 6. Movement Engine | 1/2 | In Progress|  | - |
 | 7. Character Behavior | v1.1 | 0/2 | Not started | - |
 | 8. State Detection | v1.1 | 0/2 | Not started | - |
 | 9. Visual Feedback | v1.1 | 0/2 | Not started | - |
