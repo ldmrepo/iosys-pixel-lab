@@ -27,10 +27,19 @@ export class AgentStateMachine extends EventEmitter {
   private seatAssignments: Map<string, string> = new Map(); // agentId -> seatId
   private agentCounter = 0;
   private timeoutCheckInterval: ReturnType<typeof setInterval> | null = null;
+  private layoutReady: Promise<void>;
 
   constructor() {
     super();
-    this.loadOfficeLayout();
+    this.layoutReady = this.loadOfficeLayout();
+  }
+
+  /**
+   * Resolves when the office layout has been loaded (or failed to load).
+   * Await this before starting session discovery to ensure real seats are used.
+   */
+  async waitForLayout(): Promise<void> {
+    await this.layoutReady;
   }
 
   /**

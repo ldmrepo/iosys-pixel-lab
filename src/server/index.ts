@@ -114,10 +114,13 @@ stateMachine.on('agent-removed', (agent: AgentState) => {
 
 // --- Start ---
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`[Server] Pixel Office backend running on http://localhost:${PORT}`);
   console.log(`[Server] WebSocket endpoint: ws://localhost:${PORT}/ws`);
   console.log(`[Server] REST API: http://localhost:${PORT}/api/agents`);
+
+  // Ensure office layout seats are loaded before discovering sessions
+  await stateMachine.waitForLayout();
 
   // Start session discovery after server is listening
   discovery.start();
