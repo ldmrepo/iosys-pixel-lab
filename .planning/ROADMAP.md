@@ -123,11 +123,11 @@ Plans:
   3. 서브에이전트가 부모의 팔레트/색상을 상속하여 팀 소속을 시각적으로 표현한다
   4. 스폰과 디스폰 시 Matrix 스타일 컬럼별 stagger 이펙트가 재생된다
   5. 서브에이전트 작업 완료 시 캐릭터가 자동으로 제거된다
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 10-01: progress 레코드 파서 + 서브에이전트 스폰/디스폰 상태 관리
-- [ ] 10-02: Matrix 이펙트 렌더러 + 팔레트 상속 + 자동 제거 로직
+- [ ] 10-01-PLAN.md — Type extensions + parser sub-agent event + state machine sub-agent lifecycle (SUB-01, SUB-05)
+- [ ] 10-02-PLAN.md — MatrixEffect renderer + palette inheritance + BFS spawn + sub-agent behavior + visual verification (SUB-02, SUB-03, SUB-04)
 
 ## Progress
 
