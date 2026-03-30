@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: planning
-stopped_at: Phase 9 planned — 2 plans in 1 wave ready for execution
-last_updated: "2026-03-30T15:24:32.465Z"
+status: executing
+stopped_at: Completed 09-01-PLAN.md — speech bubble system with click dismiss
+last_updated: "2026-03-30T15:31:24.211Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 40
 ---
 
@@ -18,7 +18,7 @@ progress:
 ## Current Phase
 
 **Phase 8 of 10** (v1.1) — State Detection
-**Status:** Ready to plan
+**Status:** Executing Phase 09
 
 ## Phase Status
 
@@ -48,6 +48,8 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 08-state-detection]: cancelAllTimers on every processEvent invocation — any JSONL data resets all pending timers
 - [Phase 08-state-detection]: turn_end bypasses deriveStatus — immediately sets waiting
 - [Phase 08-state-detection]: backgroundAgentIds stored inside AgentTimers per-agent — cleanup via Map.delete is automatic on removeAgent
+- [Phase 09-01]: permissionPending bubble bounces; waiting is static for clean fade; bubbleHitTest uses non-bounced position for stable click area
+- [Phase 09-01]: agentClickCallbacks.length guard moved after bubble check — bubbles dismiss even with no click listeners registered
 
 ## Accumulated Context (from v1.0)
 
@@ -64,5 +66,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Phase 9 planned — 2 plans in 1 wave ready for execution
+Stopped at: Completed 09-01-PLAN.md — speech bubble system with click dismiss
 Resume: `/gsd:plan-phase 8`
