@@ -96,7 +96,7 @@ Plans:
 
 **Milestone Goal:** UX 레이어 강화 — 대시보드 사이드 패널로 에이전트 상태를 한눈에 파악하고, 토큰/비용을 실시간 추적하며, 새 에셋팩으로 오피스 비주얼을 업그레이드한다.
 
-- [ ] **Phase 11: Layout & Dashboard Panel** - 안정적인 3열 레이아웃 위에 에이전트 상태/계층/세션 패널 구축
+- [x] **Phase 11: Layout & Dashboard Panel** - 안정적인 3열 레이아웃 위에 에이전트 상태/계층/세션 패널 구축 (completed 2026-03-30)
 - [ ] **Phase 12: Token & Cost Tracking** - JSONL turn_duration 기반 토큰 파이프라인 + 에이전트 카드 비용 표시
 - [ ] **Phase 13: Asset Replacement** - PixelOffice/Pixel Life 에셋팩으로 오피스 전면 교체 + 엔진 호환성 검증
 
@@ -115,7 +115,7 @@ Plans:
 
 Plans:
 - [x] 11-01-PLAN.md — CSS layout hardening + panel toggle with localStorage persistence
-- [ ] 11-02-PLAN.md — AgentState createdAt + agent card enrichment (tool name, elapsed time, sub-agent hierarchy)
+- [x] 11-02-PLAN.md — AgentState createdAt + agent card enrichment (tool name, elapsed time, sub-agent hierarchy)
 
 ### Phase 12: Token & Cost Tracking
 **Goal**: 서버가 JSONL turn_duration 엔트리에서 토큰 사용량을 누적·중복제거하여 USD 비용으로 변환하고, 에이전트 카드에 실시간 표시한다
@@ -157,6 +157,6 @@ Phases execute in this order: 11 → 12 → 13
 | 8. State Detection | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 9. Visual Feedback | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
-| 11. Layout & Dashboard Panel | 1/2 | In Progress|  | - |
+| 11. Layout & Dashboard Panel | v1.2 | 2/2 | Complete | 2026-03-30 |
 | 12. Token & Cost Tracking | v1.2 | 0/? | Not started | - |
 | 13. Asset Replacement | v1.2 | 0/? | Not started | - |

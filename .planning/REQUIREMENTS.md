@@ -9,9 +9,9 @@ Requirements for Dashboard & Polish milestone. Each maps to roadmap phases.
 
 ### Dashboard UI
 
-- [ ] **DASH-01**: 사이드 패널에 에이전트별 현재 상태와 활성 도구가 표시된다
-- [ ] **DASH-02**: 서브에이전트가 부모 아래 계층적으로 들여쓰기 표시된다
-- [ ] **DASH-03**: 에이전트별 세션 지속시간이 실시간으로 표시된다
+- [x] **DASH-01**: 사이드 패널에 에이전트별 현재 상태와 활성 도구가 표시된다
+- [x] **DASH-02**: 서브에이전트가 부모 아래 계층적으로 들여쓰기 표시된다
+- [x] **DASH-03**: 에이전트별 세션 지속시간이 실시간으로 표시된다
 - [ ] **DASH-04**: 에이전트별 토큰 사용량과 예상 비용이 요약 표시된다
 - [x] **DASH-05**: Canvas와 사이드 패널이 3열 레이아웃으로 공존하며 Canvas 크기가 안정적이다
 
@@ -60,9 +60,9 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | Phase 11 | Pending |
-| DASH-02 | Phase 11 | Pending |
-| DASH-03 | Phase 11 | Pending |
+| DASH-01 | Phase 11 | Complete |
+| DASH-02 | Phase 11 | Complete |
+| DASH-03 | Phase 11 | Complete |
 | DASH-04 | Phase 12 | Pending |
 | DASH-05 | Phase 11 | Complete |
 | TOKEN-01 | Phase 12 | Pending |
