@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from 'react';
 import type { AgentState, AgentStatus } from '@shared/types';
 
 interface AgentPanelProps {
@@ -40,19 +41,15 @@ function getStatusLabel(status: AgentStatus): string {
   return labels[status];
 }
 
-function formatTimeAgo(timestamp: number): string {
-  const now = Date.now();
-  const diff = Math.max(0, Math.floor((now - timestamp) / 1000));
-
-  if (diff < 60) {
-    return `${diff}s ago`;
+function formatElapsed(createdAt: number): string {
+  const elapsed = Math.max(0, Math.floor((Date.now() - createdAt) / 1000));
+  const hours = Math.floor(elapsed / 3600);
+  const minutes = Math.floor((elapsed % 3600) / 60);
+  const seconds = elapsed % 60;
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }
-  const minutes = Math.floor(diff / 60);
-  if (minutes < 60) {
-    return `${minutes}m ago`;
-  }
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function shouldBlink(status: AgentStatus): boolean {
@@ -60,20 +57,57 @@ function shouldBlink(status: AgentStatus): boolean {
 }
 
 export default function AgentPanel({ agents, onAgentClick, collapsed }: AgentPanelProps) {
+  // Tick every second to keep elapsed times updated
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Group agents into root + sub-agent hierarchy
+  const groupedAgents = useMemo(() => {
+    const roots: AgentState[] = [];
+    const childrenMap = new Map<string, AgentState[]>();
+
+    for (const agent of agents) {
+      if (agent.parentId) {
+        const children = childrenMap.get(agent.parentId) || [];
+        children.push(agent);
+        childrenMap.set(agent.parentId, children);
+      } else {
+        roots.push(agent);
+      }
+    }
+
+    // Build flat ordered list: root, then its children, then next root...
+    const result: { agent: AgentState; isSubAgent: boolean }[] = [];
+    for (const root of roots) {
+      result.push({ agent: root, isSubAgent: false });
+      const children = childrenMap.get(root.id) || [];
+      for (const child of children) {
+        result.push({ agent: child, isSubAgent: true });
+      }
+    }
+    return result;
+  }, [agents]);
+
+  // Count only root agents for the badge
+  const rootAgentCount = agents.filter(a => !a.parentId).length;
+
   return (
     <aside className={`agent-panel${collapsed ? ' agent-panel-collapsed' : ''}`}>
       <div className="agent-panel-header">
         <h2 className="agent-panel-title">Agents</h2>
-        <span className="agent-panel-count">{agents.length}</span>
+        <span className="agent-panel-count">{rootAgentCount}</span>
       </div>
       <div className="agent-panel-list">
         {agents.length === 0 && (
           <div className="agent-panel-empty">No agents connected</div>
         )}
-        {agents.map((agent) => (
+        {groupedAgents.map(({ agent, isSubAgent }) => (
           <button
             key={agent.id}
-            className="agent-card"
+            className={`agent-card${isSubAgent ? ' agent-card-sub' : ''}`}
             onClick={() => onAgentClick(agent.id)}
             type="button"
           >
@@ -82,25 +116,28 @@ export default function AgentPanel({ agents, onAgentClick, collapsed }: AgentPan
                 className={`agent-status-dot${shouldBlink(agent.status) ? ' blink' : ''}`}
                 style={{ backgroundColor: getStatusColor(agent.status) }}
               />
-              <span className="agent-card-name">{agent.name}</span>
-            </div>
-            <div
-              className="agent-card-status"
-              style={{ color: getStatusColor(agent.status) }}
-            >
-              {getStatusLabel(agent.status)}
-            </div>
-            <div className="agent-card-action" title={agent.lastAction}>
-              {agent.lastAction || 'No recent activity'}
-            </div>
-            <div className="agent-card-footer">
-              <span className="agent-card-session" title={agent.sessionId}>
-                {agent.sessionId.slice(0, 8)}
+              <span className="agent-card-name">
+                {isSubAgent ? agent.name.split('/').pop() : agent.name}
               </span>
-              <span className="agent-card-time">
-                {formatTimeAgo(agent.lastUpdated)}
+              <span className="agent-card-elapsed">
+                {formatElapsed(agent.createdAt)}
               </span>
             </div>
+            <div className="agent-card-info">
+              <span
+                className="agent-card-status"
+                style={{ color: getStatusColor(agent.status) }}
+              >
+                {getStatusLabel(agent.status)}
+              </span>
+              {agent.lastAction && (
+                <span className="agent-card-tool" title={agent.lastAction}>
+                  {agent.lastAction}
+                </span>
+              )}
+            </div>
+            {/* Phase 12 placeholder: token/cost will go here */}
+            <div className="agent-card-token-placeholder" />
           </button>
         ))}
       </div>
