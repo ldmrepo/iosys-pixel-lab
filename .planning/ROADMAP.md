@@ -4,7 +4,7 @@
 
 | Phase | Name | Requirements | Key Deliverable |
 |-------|------|-------------|-----------------|
-| 1 | Type & Manifest Expansion | R1.2, R2 | 타입 확장 + 전체 에셋 등록 |
+| 1 | 1/1 | Complete   | 2026-03-30 |
 | 2 | Office Layout Design | R1, R3, R4, R6 | 30×24 그리드 + 6존 + 전체 가구 배치 |
 | 3 | TileMap Engine Adaptation | R5.1, R5.2, R5.5 | 존 컬러 시스템 + walkableMask |
 | 4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
@@ -16,7 +16,7 @@
 
 **Goal**: 확장 오피스에 필요한 타입과 에셋 매니페스트를 준비
 **Requirements**: R1.2, R2
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 01-01-PLAN.md — FloorZone 타입 확장 + 8개 시트 등록 + SPRITES region 확장
