@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
 status: executing
-stopped_at: Completed 08-01-PLAN.md — turn_duration parser + text-idle timer
-last_updated: "2026-03-30T14:56:34.675Z"
+stopped_at: Completed 08-02-PLAN.md — backgroundAgentIds tracking complete
+last_updated: "2026-03-30T15:00:39.367Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 40
 ---
 
@@ -47,6 +47,7 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 08-state-detection]: AgentTimers interface with per-agent setTimeout replaces polling for waiting transitions
 - [Phase 08-state-detection]: cancelAllTimers on every processEvent invocation — any JSONL data resets all pending timers
 - [Phase 08-state-detection]: turn_end bypasses deriveStatus — immediately sets waiting
+- [Phase 08-state-detection]: backgroundAgentIds stored inside AgentTimers per-agent — cleanup via Map.delete is automatic on removeAgent
 
 ## Accumulated Context (from v1.0)
 
@@ -63,5 +64,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Completed 08-01-PLAN.md — turn_duration parser + text-idle timer
+Stopped at: Completed 08-02-PLAN.md — backgroundAgentIds tracking complete
 Resume: `/gsd:plan-phase 8`

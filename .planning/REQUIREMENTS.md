@@ -20,9 +20,9 @@ Requirements for Dynamic Agents milestone. Each maps to roadmap phases.
 ### State Detection
 
 - [x] **DETECT-01**: JSONL의 turn_duration 레코드로 확정적 턴 종료를 감지한다
-- [ ] **DETECT-02**: 비면제 도구가 7초간 무응답이면 permission 상태로 전환한다
-- [ ] **DETECT-03**: 새 데이터 수신 시 permission/waiting 타이머를 취소한다
-- [ ] **DETECT-04**: 백그라운드 에이전트(run_in_background)를 queue-operation으로 추적한다
+- [x] **DETECT-02**: 비면제 도구가 7초간 무응답이면 permission 상태로 전환한다
+- [x] **DETECT-03**: 새 데이터 수신 시 permission/waiting 타이머를 취소한다
+- [x] **DETECT-04**: 백그라운드 에이전트(run_in_background)를 queue-operation으로 추적한다
 - [x] **DETECT-05**: 텍스트 전용 턴에서 5초 미활동 시 waiting으로 전환한다
 
 ### Visual Feedback
@@ -79,9 +79,9 @@ Deferred to future release.
 | MOVE-05 | Phase 7 | Complete |
 | MOVE-06 | Phase 7 | Complete |
 | DETECT-01 | Phase 8 | Complete |
-| DETECT-02 | Phase 8 | Pending |
-| DETECT-03 | Phase 8 | Pending |
-| DETECT-04 | Phase 8 | Pending |
+| DETECT-02 | Phase 8 | Complete |
+| DETECT-03 | Phase 8 | Complete |
+| DETECT-04 | Phase 8 | Complete |
 | DETECT-05 | Phase 8 | Complete |
 | VISUAL-01 | Phase 9 | Pending |
 | VISUAL-02 | Phase 9 | Pending |
