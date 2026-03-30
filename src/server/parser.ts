@@ -28,6 +28,7 @@ interface RawJSONLEntry {
   // tool_result specific
   content?: string | ContentBlock[];
   name?: string;
+  tool_use_id?: string;         // present in tool_result entries for lifecycle tracking
   // assistant specific -- tool_use at top level in some formats
   input?: Record<string, unknown>;
 }
@@ -125,12 +126,14 @@ function parseAssistantEntry(
     if (block.type === 'tool_use' && block.name) {
       const isBackground = block.name === 'Bash' &&
         block.input?.run_in_background === true;
+      const isSubAgent = block.name === 'Task' || block.name === 'Agent';
       return {
         timestamp,
         sessionId,
         type: isBackground ? 'background-tool' : `tool_use:${block.name}`,
         content: summarizeToolUse(block.name, block.input),
         toolName: block.name,
+        toolCallId: isSubAgent ? (block.id ?? undefined) : undefined,
         raw,
       };
     }

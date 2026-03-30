@@ -8,6 +8,7 @@ export interface AgentEvent {
   content: string;
   raw: unknown;
   toolName?: string;             // extracted tool name for tool_use events
+  toolCallId?: string;           // tool_use block id for sub-agent tracking (Task/Agent only)
 }
 
 export interface AgentState {
@@ -19,6 +20,7 @@ export interface AgentState {
   lastUpdated: number;
   position: { x: number; y: number };
   permissionPending: boolean;   // true when waiting for tool permission (7s timeout)
+  parentId?: string;            // set for sub-agents — references the parent agent's id
 }
 
 export interface WSMessage {

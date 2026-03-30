@@ -18,7 +18,8 @@ interface AgentTimers {
   permissionTimer: ReturnType<typeof setTimeout> | null;
   textIdleTimer: ReturnType<typeof setTimeout> | null;
   hadToolsInTurn: boolean;
-  backgroundAgentIds: Set<string>;  // tool IDs of active background agents
+  backgroundAgentIds: Set<string>;    // tool IDs of active background agents
+  activeSubAgents: Map<string, string>; // toolCallId -> subAgentId
 }
 
 // Default fallback seats when office-layout is not available
@@ -40,6 +41,7 @@ export class AgentStateMachine extends EventEmitter {
   private seats: Seat[] = [...DEFAULT_SEATS];
   private seatAssignments: Map<string, string> = new Map(); // agentId -> seatId
   private agentCounter = 0;
+  private subAgentCounter = 0;  // counts down for negative sub-agent IDs
   private timeoutCheckInterval: ReturnType<typeof setInterval> | null = null;
   private layoutReady: Promise<void>;
   private agentTimers: Map<string, AgentTimers> = new Map();
@@ -117,6 +119,22 @@ export class AgentStateMachine extends EventEmitter {
       // Will emit update below
     }
 
+    // SUB-05: Check for sub-agent completion via tool_result with a matching tool_use_id
+    if (event.type === 'tool_result') {
+      const rawEntry = event.raw as Record<string, unknown>;
+      const toolUseId = rawEntry?.tool_use_id as string | undefined;
+      if (toolUseId) {
+        // Search all parent agents for a sub-agent tracked by this toolCallId
+        for (const [, parentTimers] of this.agentTimers) {
+          const subAgentId = parentTimers.activeSubAgents.get(toolUseId);
+          if (subAgentId) {
+            this.removeSubAgent(subAgentId);
+            break;
+          }
+        }
+      }
+    }
+
     // DETECT-01: turn_end (definitive turn end)
     if (event.type === 'turn_end') {
       agent.status = 'waiting';
@@ -184,6 +202,13 @@ export class AgentStateMachine extends EventEmitter {
           }
         }, PERMISSION_TIMER_DELAY_MS);
       }
+    }
+
+    // SUB-01: Spawn sub-agent for Task/Agent tool invocations
+    // Uses tool_use blocks (not progress records) as spawn trigger — more reliable,
+    // provides toolCallId for lifecycle tracking (tool_result matching).
+    if ((event.toolName === 'Task' || event.toolName === 'Agent') && event.toolCallId) {
+      this.createSubAgent(agent, event.toolCallId, event.toolName);
     }
 
     // DETECT-05: Start text-idle timer for text-only response
@@ -299,6 +324,7 @@ export class AgentStateMachine extends EventEmitter {
         textIdleTimer: null,
         hadToolsInTurn: false,
         backgroundAgentIds: new Set(),
+        activeSubAgents: new Map(),
       };
       this.agentTimers.set(agentId, timers);
     }
@@ -365,12 +391,77 @@ export class AgentStateMachine extends EventEmitter {
     const agent = this.agents.get(agentId);
     if (!agent) return;
 
+    // Cascade: clean up any active sub-agents before removing the parent
+    const timers = this.agentTimers.get(agentId);
+    if (timers) {
+      for (const subAgentId of timers.activeSubAgents.values()) {
+        this.removeSubAgent(subAgentId);
+      }
+    }
+
     this.cancelAllTimers(agentId);
     this.agentTimers.delete(agentId);
     this.releaseSeat(agentId);
     this.agents.delete(agentId);
     this.emit('agent-removed', { ...agent });
     console.log(`[StateMachine] Agent removed: ${agent.name}`);
+  }
+
+  /**
+   * SUB-01: Spawn a sub-agent when a Task or Agent tool is invoked.
+   * Sub-agents use negative IDs (sub--1, sub--2, ...) and reference the parent via parentId.
+   */
+  private createSubAgent(parentAgent: AgentState, toolCallId: string, toolName: string): AgentState {
+    this.subAgentCounter--;
+    const subAgentId = `sub-${this.subAgentCounter}`;  // e.g. "sub--1", "sub--2"
+
+    const subAgent: AgentState = {
+      id: subAgentId,
+      name: `${parentAgent.name}/${toolName}`,
+      sessionId: parentAgent.sessionId,
+      status: 'executing',
+      lastAction: `Sub-agent: ${toolName}`,
+      lastUpdated: Date.now(),
+      position: { ...parentAgent.position },  // Engine will reposition to nearest walkable
+      permissionPending: false,
+      parentId: parentAgent.id,
+    };
+
+    this.agents.set(subAgentId, subAgent);
+
+    // Track in parent's timers for lifecycle matching
+    const timers = this.getTimers(parentAgent.id);
+    timers.activeSubAgents.set(toolCallId, subAgentId);
+
+    this.emit('agent-added', { ...subAgent });
+    console.log(`[StateMachine] Sub-agent spawned: ${subAgentId} (parent: ${parentAgent.id}, tool: ${toolCallId})`);
+
+    return subAgent;
+  }
+
+  /**
+   * SUB-05: Remove a sub-agent and clean up its parent's tracking map.
+   */
+  private removeSubAgent(subAgentId: string): void {
+    const subAgent = this.agents.get(subAgentId);
+    if (!subAgent) return;
+
+    // Remove from parent's activeSubAgents tracking
+    if (subAgent.parentId) {
+      const parentTimers = this.agentTimers.get(subAgent.parentId);
+      if (parentTimers) {
+        for (const [toolId, sId] of parentTimers.activeSubAgents) {
+          if (sId === subAgentId) {
+            parentTimers.activeSubAgents.delete(toolId);
+            break;
+          }
+        }
+      }
+    }
+
+    this.agents.delete(subAgentId);
+    this.emit('agent-removed', { ...subAgent });
+    console.log(`[StateMachine] Sub-agent removed: ${subAgentId}`);
   }
 
   /**
