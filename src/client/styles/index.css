@@ -113,9 +113,42 @@ body {
 /* ─── Canvas Wrapper ─── */
 .canvas-wrapper {
   flex: 1;
+  min-width: 0; /* prevents flex item from overflowing when panel is present */
   position: relative;
   overflow: hidden;
   background: var(--bg-primary);
+}
+
+/* ─── Panel Toggle Button ─── */
+.panel-toggle {
+  position: absolute;
+  right: 0;
+  top: 8px;
+  z-index: 10;
+  width: 24px;
+  height: 48px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.panel-toggle:hover {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: var(--border-active);
+}
+
+.panel-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .office-canvas-container {
@@ -144,6 +177,14 @@ body {
   flex-direction: column;
   background: var(--bg-secondary);
   border-left: 1px solid var(--border);
+  overflow: hidden;
+  transition: width 0.2s ease, border-color 0.2s ease;
+}
+
+.agent-panel.agent-panel-collapsed {
+  width: 0;
+  min-width: 0;
+  border-left: none;
   overflow: hidden;
 }
 
@@ -414,6 +455,23 @@ body {
     max-height: 200px;
     border-left: none;
     border-top: 1px solid var(--border);
+  }
+
+  .agent-panel.agent-panel-collapsed {
+    max-height: 0;
+    border-top: none;
+  }
+
+  .panel-toggle {
+    right: auto;
+    left: 8px;
+    top: auto;
+    bottom: 0;
+    width: 48px;
+    height: 24px;
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
   }
 
   .agent-panel-list {

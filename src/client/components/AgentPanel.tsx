@@ -3,6 +3,7 @@ import type { AgentState, AgentStatus } from '@shared/types';
 interface AgentPanelProps {
   agents: AgentState[];
   onAgentClick: (id: string) => void;
+  collapsed: boolean;
 }
 
 function getStatusColor(status: AgentStatus): string {
@@ -58,9 +59,9 @@ function shouldBlink(status: AgentStatus): boolean {
   return status === 'waiting' || status === 'error';
 }
 
-export default function AgentPanel({ agents, onAgentClick }: AgentPanelProps) {
+export default function AgentPanel({ agents, onAgentClick, collapsed }: AgentPanelProps) {
   return (
-    <aside className="agent-panel">
+    <aside className={`agent-panel${collapsed ? ' agent-panel-collapsed' : ''}`}>
       <div className="agent-panel-header">
         <h2 className="agent-panel-title">Agents</h2>
         <span className="agent-panel-count">{agents.length}</span>

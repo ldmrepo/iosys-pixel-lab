@@ -25,6 +25,9 @@ export default function App() {
     const stored = localStorage.getItem('pixel-office-sound-enabled');
     return stored === 'false';
   });
+  const [panelCollapsed, setPanelCollapsed] = useState(() => {
+    return localStorage.getItem('pixel-office-panel-collapsed') === 'true';
+  });
   const prevAgentStatusRef = useRef<Map<string, AgentStatus>>(new Map());
 
   // Lazy-init chime on first render
@@ -61,6 +64,14 @@ export default function App() {
       const newMuted = chime.toggle();
       setSoundMuted(newMuted);
     }
+  }, []);
+
+  const handlePanelToggle = useCallback(() => {
+    setPanelCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('pixel-office-panel-collapsed', String(next));
+      return next;
+    });
   }, []);
 
   const handleCanvasAgentClick = useCallback(
@@ -113,8 +124,20 @@ export default function App() {
               onClose={handleTooltipClose}
             />
           )}
+          <button
+            className="panel-toggle"
+            onClick={handlePanelToggle}
+            type="button"
+            title={panelCollapsed ? 'Expand panel' : 'Collapse panel'}
+          >
+            {panelCollapsed ? '\u25C0' : '\u25B6'}
+          </button>
         </div>
-        <AgentPanel agents={agentList} onAgentClick={handlePanelAgentClick} />
+        <AgentPanel
+          agents={agentList}
+          onAgentClick={handlePanelAgentClick}
+          collapsed={panelCollapsed}
+        />
       </main>
       <StatusBar
         connectionState={connectionState}
