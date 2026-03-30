@@ -1,48 +1,104 @@
-# REQUIREMENTS — v1.0 Office Space Rebuild
+# Requirements: Pixel Office
 
-## R1: 확장 오피스 그리드
-- [x] **R1.1**: 맵 크기 20×15 → 30×24로 확장 (480×384px)
-- [x] **R1.2**: 6개 존 구분 (서버룸, 작업존A, 작업존B, 회의실, 라운지, 로비)
-- [x] **R1.3**: 각 존에 고유 바닥 타일 컬러/텍스처 적용
-- [x] **R1.4**: 벽 타일은 전체 외곽 + 서버룸/회의실 내벽 파티션
+**Defined:** 2026-03-30
+**Core Value:** AI 코딩 에이전트의 실시간 활동 상태를 픽셀 아트 캐릭터로 직관적으로 시각화
 
-## R2: 에셋 매니페스트 확장
-- **R2.1**: 미사용 시트 등록 (Beds1, DoorsHospital, TilesHospital, Chimney, Chimney1, Bathroom, Beds, BedHospital)
-- **R2.2**: 각 시트의 스프라이트 region 좌표 정확히 매핑
-- **R2.3**: 기존 시트의 미사용 스프라이트도 활용 가능하도록 SPRITES 확장
+## v1.1 Requirements
 
-## R3: 존별 가구 배치
-- [x] **R3.1**: 서버룸 — Beds1 네온 서버랙 4~6개, Hospital Misc 모니터링 장비
-- [x] **R3.2**: 작업존 A/B — 데스크 포드 (의자+데스크+모니터), 총 좌석 20~24석
-- [x] **R3.3**: 회의실 — 대형 테이블 + 의자 6석 + TV + 유리문 + 화이트보드
-- [x] **R3.4**: 라운지 — 컬러 소파 2개 + 카펫 + 벽난로 + 커피테이블 + 조명
-- [x] **R3.5**: 탕비실 — 냉장고 + 카운터 + 정수기
-- [x] **R3.6**: 로비 — 대기 소파 + 접수 카운터 + 유리 정문 + 대형 식물
+Requirements for Dynamic Agents milestone. Each maps to roadmap phases.
 
-## R4: 벽면 장식
-- [x] **R4.1**: 북벽 창문 7~9개 (Windows-Sheet, 우드/블루/퍼플 교차)
-- [x] **R4.2**: 남벽 유리 이중문 (DoorsHospital)
-- [x] **R4.3**: 벽면 그림 6~8점 (Paintings + Paintings1)
-- [x] **R4.4**: 존 경계에 식물 10~14개 배치
+### Character Movement
 
-## R5: 엔진 적응
-- **R5.1**: TileMap — 6개 존 컬러 시스템 (하드코딩 → 설정 기반)
-- **R5.2**: 전체 가구에 walkableMask 적용 (현재 소파/식물/책장 등 누락)
-- **R5.3**: ObjectRenderer — 신규 가구 타입 스프라이트 렌더링 지원
-- **R5.4**: PathFinder/CharacterBehavior — 확장 맵에서 좌석 배정 정상 동작
-- **R5.5**: Camera — 초기 뷰포트가 30×24 맵 전체를 적절히 표시
+- [ ] **MOVE-01**: 캐릭터가 idle/walk/type 3상태 FSM으로 동작한다
+- [ ] **MOVE-02**: 캐릭터가 BFS 경로탐색으로 타일 간 이동한다 (4방향, 장애물 회피)
+- [ ] **MOVE-03**: 에이전트 활성화 시 캐릭터가 배정된 좌석으로 걸어간다
+- [ ] **MOVE-04**: 에이전트 비활성 시 캐릭터가 사무실을 랜덤 배회한다 (2~20초 대기 → 이동 → 좌석 복귀)
+- [ ] **MOVE-05**: 도구 종류에 따라 typing/reading 애니메이션이 분기된다 (Read/Grep→reading, Write/Edit→typing)
+- [ ] **MOVE-06**: 캐릭터 걷기 애니메이션이 4프레임으로 방향별 재생된다
+- [ ] **MOVE-07**: 캐릭터가 자기 좌석을 pathfinding 시 임시 unblock하여 도달할 수 있다
 
-## R6: 인테리어 소품 규칙
-- [x] **R6.1**: 식물 — 코너, 복도 끝, 문 옆에 10~14개
-- [x] **R6.2**: 조명 — 라운지 2개, 서버룸 1개, 로비 2개
-- [x] **R6.3**: 카펫 — 회의실 전체, 라운지 중앙
-- [x] **R6.4**: 소파 컬러 — LivingRoom1 11색 중 2~3색 선택하여 구역별 차별화
+### State Detection
 
-## Acceptance Criteria
-- [ ] 30×24 맵이 정상 렌더링됨
-- [ ] 6개 존이 시각적으로 구분됨
-- [ ] 모든 가구에 walkableMask 적용됨
-- [ ] 에이전트가 20~24석에 정상 배정됨
-- [ ] 서버룸 네온 서버랙이 정상 표시됨
-- [ ] 기존 WebSocket/상태머신 연동 정상 동작
-- [ ] `npm run typecheck` 통과
+- [ ] **DETECT-01**: JSONL의 turn_duration 레코드로 확정적 턴 종료를 감지한다
+- [ ] **DETECT-02**: 비면제 도구가 7초간 무응답이면 permission 상태로 전환한다
+- [ ] **DETECT-03**: 새 데이터 수신 시 permission/waiting 타이머를 취소한다
+- [ ] **DETECT-04**: 백그라운드 에이전트(run_in_background)를 queue-operation으로 추적한다
+- [ ] **DETECT-05**: 텍스트 전용 턴에서 5초 미활동 시 waiting으로 전환한다
+
+### Visual Feedback
+
+- [ ] **VISUAL-01**: Permission 말풍선이 도구 권한 대기 시 캐릭터 위에 표시된다 (호박색 "...")
+- [ ] **VISUAL-02**: Waiting 말풍선이 턴 종료 시 표시되고 2초 후 페이드아웃된다 (녹색 체크마크)
+- [ ] **VISUAL-03**: 말풍선 클릭으로 즉시 닫을 수 있다
+- [ ] **VISUAL-04**: 턴 종료 시 2음 차임 사운드가 재생된다 (E5→E6, Web Audio API)
+- [ ] **VISUAL-05**: 사운드 on/off 토글이 가능하다
+
+### Sub-Agents
+
+- [ ] **SUB-01**: Task/Agent 도구의 progress 레코드에서 서브에이전트를 감지한다
+- [ ] **SUB-02**: 서브에이전트가 부모 근처 walkable 타일에 음수 ID 캐릭터로 스폰된다
+- [ ] **SUB-03**: 서브에이전트가 부모의 팔레트/색상을 상속받는다
+- [ ] **SUB-04**: 서브에이전트 스폰/디스폰 시 Matrix 이펙트가 재생된다 (컬럼별 stagger)
+- [ ] **SUB-05**: 서브에이전트 작업 완료 시 캐릭터가 자동 제거된다
+
+## v2 Requirements
+
+Deferred to future release.
+
+### Dashboard UI
+
+- **DASH-01**: 에이전트별 상태/도구 표시하는 사이드 패널
+- **DASH-02**: 토큰 사용량 실시간 추적
+- **DASH-03**: 세션 히스토리 검색
+
+### Layout Editor
+
+- **EDIT-01**: 드래그 앤 드롭 가구 배치
+- **EDIT-02**: 타일 타입 변경 (floor/wall/void)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Tauri/Electron 래핑 | 웹앱으로 충분, 데스크탑 앱은 오버킬 |
+| CASS 검색 엔진 | AgentRoom 전용 기능, 현재 불필요 |
+| 오피스 레이아웃 에디터 | v2 이후 — 현재 코드 기반 레이아웃으로 충분 |
+| 토큰/비용 추적 | v2 이후 — 대시보드 UI와 함께 |
+| VS Code 확장 | 독립 웹앱 유지 |
+| OAuth/인증 | 로컬 전용 도구 |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| MOVE-01 | - | Pending |
+| MOVE-02 | - | Pending |
+| MOVE-03 | - | Pending |
+| MOVE-04 | - | Pending |
+| MOVE-05 | - | Pending |
+| MOVE-06 | - | Pending |
+| MOVE-07 | - | Pending |
+| DETECT-01 | - | Pending |
+| DETECT-02 | - | Pending |
+| DETECT-03 | - | Pending |
+| DETECT-04 | - | Pending |
+| DETECT-05 | - | Pending |
+| VISUAL-01 | - | Pending |
+| VISUAL-02 | - | Pending |
+| VISUAL-03 | - | Pending |
+| VISUAL-04 | - | Pending |
+| VISUAL-05 | - | Pending |
+| SUB-01 | - | Pending |
+| SUB-02 | - | Pending |
+| SUB-03 | - | Pending |
+| SUB-04 | - | Pending |
+| SUB-05 | - | Pending |
+
+**Coverage:**
+- v1.1 requirements: 22 total
+- Mapped to phases: 0
+- Unmapped: 22
+
+---
+*Requirements defined: 2026-03-30*
+*Last updated: 2026-03-30 after initial definition*
