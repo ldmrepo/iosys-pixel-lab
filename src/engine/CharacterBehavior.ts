@@ -25,6 +25,16 @@ const ACTIVE_STATUSES: Set<AgentStatus> = new Set([
   'typing', 'reading', 'executing',
 ]);
 
+/** Wander timing constants (Pixel Agents levels). */
+const WANDER_PAUSE_MIN = 2;    // seconds
+const WANDER_PAUSE_MAX = 20;   // seconds
+const WANDER_MOVES_MIN = 3;    // moves before rest
+const WANDER_MOVES_MAX = 6;
+const SEAT_REST_MIN = 120;     // seconds
+const SEAT_REST_MAX = 240;     // seconds
+const SEAT_LEAVE_MIN = 2;      // seconds
+const SEAT_LEAVE_MAX = 5;      // seconds
+
 /** Randomize a value between min and max. */
 function randRange(min: number, max: number): number {
   return min + Math.random() * (max - min);
@@ -51,19 +61,19 @@ export class CharacterBehavior {
 
   /** Timer: delay before leaving work seat after becoming inactive. */
   private seatLeaveTimer: number = 0;
-  private readonly seatLeaveDelay: number = randRange(2, 5); // seconds
+  private readonly seatLeaveDelay: number = randRange(SEAT_LEAVE_MIN, SEAT_LEAVE_MAX); // seconds
 
   /** Timer: delay before next wander while idle. */
   private wanderTimer: number = 0;
-  private wanderPause: number = randRange(3, 12); // seconds
+  private wanderPause: number = randRange(WANDER_PAUSE_MIN, WANDER_PAUSE_MAX); // seconds
 
   /** Count wanders before returning to seat for rest. */
   private wanderCount: number = 0;
-  private wanderLimit: number = Math.floor(randRange(2, 5));
+  private wanderLimit: number = Math.floor(randRange(WANDER_MOVES_MIN, WANDER_MOVES_MAX));
 
   /** Timer: rest at seat after wander cycle. */
   private seatRestTimer: number = 0;
-  private readonly seatRestDuration: number = randRange(15, 40); // seconds
+  private readonly seatRestDuration: number = randRange(SEAT_REST_MIN, SEAT_REST_MAX); // seconds
   private isResting: boolean = false;
 
   /** Current walk destination type. */
@@ -121,14 +131,14 @@ export class CharacterBehavior {
       case 'break':
       case 'wander':
         this.state = 'idle';
-        this.wanderTimer = randRange(3, 12);
+        this.wanderTimer = randRange(WANDER_PAUSE_MIN, WANDER_PAUSE_MAX);
         break;
       case 'rest':
         this.state = 'work';
         this.isResting = true;
         this.seatRestTimer = this.seatRestDuration;
         this.wanderCount = 0;
-        this.wanderLimit = Math.floor(randRange(2, 5));
+        this.wanderLimit = Math.floor(randRange(WANDER_MOVES_MIN, WANDER_MOVES_MAX));
         break;
     }
     this.walkTarget = null;
@@ -212,7 +222,7 @@ export class CharacterBehavior {
   private goToWander(): void {
     const { walkableTiles } = this.config;
     if (walkableTiles.length === 0) {
-      this.wanderTimer = randRange(3, 12);
+      this.wanderTimer = randRange(WANDER_PAUSE_MIN, WANDER_PAUSE_MAX);
       return;
     }
     const target = walkableTiles[Math.floor(Math.random() * walkableTiles.length)];
