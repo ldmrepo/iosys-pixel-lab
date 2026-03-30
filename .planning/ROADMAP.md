@@ -64,8 +64,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — 4방향 walk 스프라이트시트 확장 + 엔진 방향 시스템 구현
-- [ ] 06-02-PLAN.md — E2E 연동 gap 수정 + 좌석 배정 + 통합 검증
+- [x] 06-01-PLAN.md — 4방향 walk 스프라이트시트 확장 + 엔진 방향 시스템 구현
+- [x] 06-02-PLAN.md — E2E 연동 gap 수정 + 좌석 배정 + 통합 검증
 
 ### Phase 7: Character Behavior
 **Goal**: 캐릭터가 에이전트 활성 상태에 따라 좌석으로 걸어가거나 사무실을 배회하며, 도구별 애니메이션이 분기된다
@@ -76,11 +76,10 @@ Plans:
   2. 에이전트가 비활성 상태일 때 캐릭터가 2~20초 대기 → 랜덤 이동 → 좌석 복귀 루프를 반복한다
   3. Read/Grep 도구 사용 중에는 reading 애니메이션이, Write/Edit 도구 사용 중에는 typing 애니메이션이 재생된다
   4. 캐릭터 걷기 애니메이션이 이동 방향(상하좌우)에 맞춰 4프레임으로 재생된다
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 07-01: 좌석 배정 이동 + 랜덤 배회 로직
-- [ ] 07-02: 도구별 애니메이션 분기 + 방향별 walk 프레임
+- [ ] 07-01-PLAN.md — Pixel Agents 타이밍 튜닝 + 전체 E2E 검증 (좌석 이동, 배회, 도구 애니메이션, 방향 걷기)
 
 ### Phase 8: State Detection
 **Goal**: 서버가 JSONL 스트림에서 턴 종료·권한 요청·백그라운드 에이전트 상태를 확정적으로 감지한다
@@ -144,7 +143,7 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 4. ObjectRenderer & Sprites | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 6. Movement Engine | 2/2 | Complete   | 2026-03-30 | - |
-| 7. Character Behavior | v1.1 | 0/2 | Not started | - |
+| 7. Character Behavior | v1.1 | 0/1 | Not started | - |
 | 8. State Detection | v1.1 | 0/2 | Not started | - |
 | 9. Visual Feedback | v1.1 | 0/2 | Not started | - |
 | 10. Sub-Agents | v1.1 | 0/2 | Not started | - |
