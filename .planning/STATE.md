@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Phase 11 planned — 2 plans in 2 waves ready for execution
-last_updated: "2026-03-30T22:30:43.850Z"
+stopped_at: "11-01 checkpoint:human-verify — Task 1 complete, awaiting visual verification"
+last_updated: "2026-03-30T22:34:15.977Z"
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # STATE — v1.2 Dashboard & Polish
@@ -41,6 +41,7 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 - Phase 13: 에셋 교체는 독립적 — Phase 11 레이아웃 안정화 후 Phase 12와 병렬 진행 가능
 - token 데이터 소스: JSONL system/turn_duration 엔트리 (assistant 스트리밍 엔트리 불사용 — 100-174x 과소산정)
 - costUSD JSONL 필드 사용 금지 — v1.0.9 이후 삭제됨, 서버 측에서 pricing.ts로 직접 계산
+- [Phase 11-layout-dashboard-panel]: Panel toggle button inside canvas-wrapper (absolute, right:0) stays visible when panel collapses to width:0
 
 ## Critical Pitfalls to Avoid
 
@@ -77,4 +78,4 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 
 ## Last Session
 
-Stopped at: Phase 11 planned — 2 plans in 2 waves ready for execution
+Stopped at: 11-01 checkpoint:human-verify — Task 1 complete, awaiting visual verification
