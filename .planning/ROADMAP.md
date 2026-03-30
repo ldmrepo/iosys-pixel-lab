@@ -61,11 +61,11 @@ Plans:
   1. 캐릭터가 idle / walk / type 세 상태 사이를 전환하며, 상태마다 올바른 스프라이트 애니메이션이 재생된다
   2. 캐릭터가 출발지에서 목적지까지 4방향 BFS 경로를 계산하고 장애물을 우회하며 타일 단위로 이동한다
   3. 캐릭터가 자기 좌석을 목적지로 삼을 때 해당 타일을 임시 walkable로 처리하여 도달할 수 있다
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: FSM 구현 (idle/walk/type 상태 + 전환 규칙)
-- [ ] 06-02: BFS 경로탐색 + 좌석 임시 unblock 로직
+- [ ] 06-01-PLAN.md — 4방향 walk 스프라이트시트 확장 + 엔진 방향 시스템 구현
+- [ ] 06-02-PLAN.md — E2E 연동 gap 수정 + 좌석 배정 + 통합 검증
 
 ### Phase 7: Character Behavior
 **Goal**: 캐릭터가 에이전트 활성 상태에 따라 좌석으로 걸어가거나 사무실을 배회하며, 도구별 애니메이션이 분기된다
@@ -143,7 +143,7 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 3. TileMap Engine Adaptation | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 4. ObjectRenderer & Sprites | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
-| 6. Movement Engine | v1.1 | 0/2 | Not started | - |
+| 6. Movement Engine | v1.1 | 0/2 | Planning complete | - |
 | 7. Character Behavior | v1.1 | 0/2 | Not started | - |
 | 8. State Detection | v1.1 | 0/2 | Not started | - |
 | 9. Visual Feedback | v1.1 | 0/2 | Not started | - |
