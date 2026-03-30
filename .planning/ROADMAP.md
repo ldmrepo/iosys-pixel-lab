@@ -101,7 +101,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 04-01-PLAN.md — Engine renderWidth/renderHeight fix + 17 SPRITES corrections + 72 furniture sizing + visual verification
+- [x] 04-01-PLAN.md — Engine renderWidth/renderHeight fix + 17 SPRITES corrections + 72 furniture sizing + visual verification
 
 **Files**:
 - `src/shared/types.ts` — FurnitureObject에 renderWidth/renderHeight 추가
@@ -121,21 +121,24 @@ Plans:
 
 ## Phase 5: Integration & Verification
 
-**Goal**: 확장 오피스에서 전체 시스템이 정상 동작하는지 검증
+**Goal**: 3개 결함 수정 (좌석 수 버그, 비동기 레이스, 폴백 레이아웃) + 전체 시스템 E2E 검증
 **Requirements**: R5.4
+**Plans:** 1 plan
+
+Plans:
+- [ ] 05-01-PLAN.md — Fix seat count bug + async race condition + FALLBACK_LAYOUT + visual verification
 
 **Files**:
-- `src/engine/index.ts` — 좌석 배정 로직
-- `src/server/state-machine.ts` — 좌석 수 대응
-- 전체 파일 대상 typecheck
+- `src/shared/office-layout.ts` — createPod 좌석 수 수정 (40 -> 20)
+- `src/server/state-machine.ts` — 비동기 레이아웃 로딩 레이스 수정
+- `src/server/index.ts` — 서버 시작 시 레이아웃 대기
+- `src/engine/index.ts` — FALLBACK_LAYOUT 30x24로 업데이트
 
 **Tasks**:
-1. PathFinder가 30x24 맵에서 모든 좌석으로 경로를 찾을 수 있는지 검증
-2. CharacterBehavior 워킹/아이들이 확장 맵에서 정상 동작하는지 확인
-3. StateMachine 좌석 배정이 24석 기준으로 정상 동작하는지 확인
-4. `npm run typecheck` 통과
-5. `npm run dev` 실행하여 시각적 검증
-6. 에이전트 추가/제거/상태변경 WebSocket 시나리오 정상 동작
+1. createPod을 단일 컬럼으로 수정 (8석/포드 -> 4석/포드, 총 20석)
+2. StateMachine에 waitForLayout() 추가 + 서버 시작 시 await
+3. FALLBACK_LAYOUT 30x24로 업데이트
+4. 시각적 검증 (인간 확인) — 최종 마일스톤 게이트
 
 **Success**: Acceptance Criteria 전항목 충족
 
