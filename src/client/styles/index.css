@@ -75,6 +75,34 @@ body {
   text-transform: uppercase;
 }
 
+/* ─── Sound Toggle ─── */
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.sound-toggle:hover {
+  border-color: var(--border-active);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.sound-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* ─── Main Content ─── */
 .app-main {
   display: flex;
