@@ -5,7 +5,7 @@
 | Phase | Name | Requirements | Key Deliverable |
 |-------|------|-------------|-----------------|
 | 1 | 1/1 | Complete   | 2026-03-30 |
-| 2 | Office Layout Design | R1, R3, R4, R6 | 30×24 그리드 + 6존 + 전체 가구 배치 |
+| 2 | Office Layout Design | R1, R3, R4, R6 | 30x24 그리드 + 6존 + 전체 가구 배치 |
 | 3 | TileMap Engine Adaptation | R5.1, R5.2, R5.5 | 존 컬러 시스템 + walkableMask |
 | 4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
 | 5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
@@ -19,7 +19,7 @@
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 01-01-PLAN.md — FloorZone 타입 확장 + 8개 시트 등록 + SPRITES region 확장
+- [x] 01-01-PLAN.md — FloorZone 타입 확장 + 8개 시트 등록 + SPRITES region 확장
 
 **Files**:
 - `src/shared/types.ts` — 존 타입, 맵 크기 유연화
@@ -28,7 +28,7 @@ Plans:
 **Tasks**:
 1. `types.ts`에 FloorZone 타입 추가 (corridor, work, lounge, server, meeting, lobby)
 2. `asset-manifest.ts`에 미사용 시트 등록:
-   - beds1 (Beds1-Sheet → 서버랙)
+   - beds1 (Beds1-Sheet -> 서버랙)
    - doorsHospital (DoorsHospital-Sheet)
    - tilesHospital (TilesHospital)
    - chimney (Chimney-Sheet)
@@ -44,14 +44,18 @@ Plans:
 
 ## Phase 2: Office Layout Design
 
-**Goal**: 30×24 그리드에 6개 존과 전체 가구를 체계적으로 배치
+**Goal**: 30x24 그리드에 6개 존과 전체 가구를 체계적으로 배치
 **Requirements**: R1, R3, R4, R6
+**Plans:** 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — 30x24 그리드 + 6존 배치 + 전체 가구/좌석 배치 + 벽면 장식
 
 **Files**:
 - `src/shared/office-layout.ts` — 전면 재작성
 
 **Tasks**:
-1. 30×24 타일 그리드 생성 (6개 존 매핑)
+1. 30x24 타일 그리드 생성 (6개 존 매핑)
 2. 벽 배치 (외곽 + 서버룸/회의실 내벽 파티션)
 3. 서버룸 가구 배치 (Beds1 네온랙 + 모니터링 장비)
 4. 작업존 A/B 데스크 포드 생성 (총 20~24석)
@@ -76,11 +80,11 @@ Plans:
 - `src/engine/index.ts` — walkableMask 캐싱 개선, 카메라 초기화
 
 **Tasks**:
-1. TileMap 존 컬러를 하드코딩에서 설정 맵으로 변경 (spriteIndex → zoneColors 맵)
+1. TileMap 존 컬러를 하드코딩에서 설정 맵으로 변경 (spriteIndex -> zoneColors 맵)
 2. 6개 존 컬러 정의 (서버룸 다크네이비, 작업존 브라운, 회의실 그린, 라운지 베이지, 로비 크림, 복도 라이트베이지)
 3. 벽 렌더링 개선 (내벽 파티션 지원)
 4. walkableMask 캐싱 로직이 확장 맵에서 정상 동작하도록 수정
-5. Camera 초기 줌/위치를 30×24 맵에 맞게 조정
+5. Camera 초기 줌/위치를 30x24 맵에 맞게 조정
 
 **Success**: 6개 존이 시각적으로 구분, 맵 전체 정상 렌더링
 
@@ -118,7 +122,7 @@ Plans:
 - 전체 파일 대상 typecheck
 
 **Tasks**:
-1. PathFinder가 30×24 맵에서 모든 좌석으로 경로를 찾을 수 있는지 검증
+1. PathFinder가 30x24 맵에서 모든 좌석으로 경로를 찾을 수 있는지 검증
 2. CharacterBehavior 워킹/아이들이 확장 맵에서 정상 동작하는지 확인
 3. StateMachine 좌석 배정이 24석 기준으로 정상 동작하는지 확인
 4. `npm run typecheck` 통과
@@ -133,12 +137,12 @@ Plans:
 
 ```
 Phase 1 (types/manifest)
- ↓
-Phase 2 (layout) ───→ Phase 3 (tilemap engine)
-                        ↓
+ |
+Phase 2 (layout) ---> Phase 3 (tilemap engine)
+                        |
                       Phase 4 (object renderer)
-                        ↓
+                        |
                       Phase 5 (integration)
 ```
 
-Phase 1 → Phase 2는 순차, Phase 3/4는 Phase 2 완료 후 진행, Phase 5는 모든 phase 완료 후.
+Phase 1 -> Phase 2는 순차, Phase 3/4는 Phase 2 완료 후 진행, Phase 5는 모든 phase 완료 후.
