@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: not_started
-stopped_at: Defining requirements
+status: ready_to_plan
+stopped_at: Roadmap created — Phase 6 ready to plan
 last_updated: "2026-03-30T12:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 10
   completed_plans: 0
 ---
 
@@ -16,27 +16,36 @@ progress:
 
 ## Current Phase
 
-**Not started** — Defining requirements
+**Phase 6 of 10** (v1.1) — Movement Engine
+**Status:** Ready to plan
 
 ## Phase Status
 
-(No phases yet — roadmap pending)
+| Phase | Name | Status |
+|-------|------|--------|
+| 6 | Movement Engine | Ready to plan |
+| 7 | Character Behavior | Not started |
+| 8 | State Detection | Not started |
+| 9 | Visual Feedback | Not started |
+| 10 | Sub-Agents | Not started |
+
+Progress: [░░░░░░░░░░] 0% (0/10 plans)
 
 ## Decisions
 
 - v1.1 범위: Full (6가지 모두) — 캐릭터 FSM + BFS + turn_duration + 말풍선 + 서브에이전트 + 사운드
-- 대시보드 UI 제외 (v1.2 이후)
-- Pixel Agents 코드 분석 기반 구현 방향 결정
+- 대시보드 UI 제외 (v2 이후)
+- Phase 8 (State Detection)은 Phase 7과 독립적 — 병렬 착수 가능
+- Phase 10 (Sub-Agents)은 Phase 6 + Phase 8 모두 완료 필요
 
 ## Accumulated Context (from v1.0)
 
-- 맵 크기: 30×24 (480×384px)
-- 에셋: 기존 MetroCity CC0만 사용 (외부 생성 도구 없음)
-- 존 구분: 6개 (서버룸/작업A/작업B/회의실/라운지/로비)
+- 맵 크기: 30×24 (480×384px), walkable 타일 시스템 완비
+- 에셋: MetroCity CC0, 기존 3 캐릭터 스프라이트 (claude/codex/gemini, 32×32, 7 animation states)
+- StateMachine (state-machine.ts): layoutReady promise, 서버 시작 시 await 패턴 적용됨
 - renderWidth/renderHeight optional fields on FurnitureObject
 - drawOffsetY positive = shift up convention
-- createPod single-column: 2 tiles wide, 4 seats per pod
-- layoutReady promise on StateMachine for async startup ordering
+- createPod single-column: 2 tiles wide, 4 seats per pod, 총 20석
 
 ## Blockers
 
@@ -44,4 +53,5 @@ progress:
 
 ## Last Session
 
-Stopped at: Defining requirements for v1.1
+Stopped at: Roadmap created for v1.1 — 22 requirements mapped to Phases 6-10
+Resume: `/gsd:plan-phase 6`

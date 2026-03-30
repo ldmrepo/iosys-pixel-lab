@@ -71,34 +71,34 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MOVE-01 | - | Pending |
-| MOVE-02 | - | Pending |
-| MOVE-03 | - | Pending |
-| MOVE-04 | - | Pending |
-| MOVE-05 | - | Pending |
-| MOVE-06 | - | Pending |
-| MOVE-07 | - | Pending |
-| DETECT-01 | - | Pending |
-| DETECT-02 | - | Pending |
-| DETECT-03 | - | Pending |
-| DETECT-04 | - | Pending |
-| DETECT-05 | - | Pending |
-| VISUAL-01 | - | Pending |
-| VISUAL-02 | - | Pending |
-| VISUAL-03 | - | Pending |
-| VISUAL-04 | - | Pending |
-| VISUAL-05 | - | Pending |
-| SUB-01 | - | Pending |
-| SUB-02 | - | Pending |
-| SUB-03 | - | Pending |
-| SUB-04 | - | Pending |
-| SUB-05 | - | Pending |
+| MOVE-01 | Phase 6 | Pending |
+| MOVE-02 | Phase 6 | Pending |
+| MOVE-07 | Phase 6 | Pending |
+| MOVE-03 | Phase 7 | Pending |
+| MOVE-04 | Phase 7 | Pending |
+| MOVE-05 | Phase 7 | Pending |
+| MOVE-06 | Phase 7 | Pending |
+| DETECT-01 | Phase 8 | Pending |
+| DETECT-02 | Phase 8 | Pending |
+| DETECT-03 | Phase 8 | Pending |
+| DETECT-04 | Phase 8 | Pending |
+| DETECT-05 | Phase 8 | Pending |
+| VISUAL-01 | Phase 9 | Pending |
+| VISUAL-02 | Phase 9 | Pending |
+| VISUAL-03 | Phase 9 | Pending |
+| VISUAL-04 | Phase 9 | Pending |
+| VISUAL-05 | Phase 9 | Pending |
+| SUB-01 | Phase 10 | Pending |
+| SUB-02 | Phase 10 | Pending |
+| SUB-03 | Phase 10 | Pending |
+| SUB-04 | Phase 10 | Pending |
+| SUB-05 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after initial definition*
+*Last updated: 2026-03-30 — traceability filled after roadmap creation*
