@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Completed 11-01-PLAN.md — checkpoint approved, ready for 11-02
-last_updated: "2026-03-30T22:48:59.419Z"
+stopped_at: "11-02-PLAN.md checkpoint:human-verify — Tasks 1-2 complete, awaiting visual verification"
+last_updated: "2026-03-30T22:53:07.228Z"
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # STATE — v1.2 Dashboard & Polish
@@ -42,6 +42,8 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 - token 데이터 소스: JSONL system/turn_duration 엔트리 (assistant 스트리밍 엔트리 불사용 — 100-174x 과소산정)
 - costUSD JSONL 필드 사용 금지 — v1.0.9 이후 삭제됨, 서버 측에서 pricing.ts로 직접 계산
 - [Phase 11-layout-dashboard-panel]: Panel toggle button inside canvas-wrapper (absolute, right:0) stays visible when panel collapses to width:0
+- [Phase 11-layout-dashboard-panel]: createdAt is required (not optional) on AgentState — every agent has a creation time
+- [Phase 11-layout-dashboard-panel]: Agent count badge excludes sub-agents — users care about top-level session count
 
 ## Critical Pitfalls to Avoid
 
@@ -78,4 +80,4 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 
 ## Last Session
 
-Stopped at: Completed 11-01-PLAN.md — checkpoint approved, ready for 11-02
+Stopped at: 11-02-PLAN.md checkpoint:human-verify — Tasks 1-2 complete, awaiting visual verification
