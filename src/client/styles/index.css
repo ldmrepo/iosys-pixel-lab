@@ -331,9 +331,28 @@ body {
   min-width: 0;
 }
 
-.agent-card-token-placeholder {
-  /* Reserved for Phase 12 token/cost display */
-  min-height: 0;
+.agent-card-tokens {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+.agent-card-cost {
+  color: var(--status-executing, #4ade80);
+  font-weight: 600;
+}
+
+.agent-card-token-sep {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.agent-card-token-count {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .agent-card-footer {

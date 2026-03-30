@@ -56,6 +56,21 @@ function shouldBlink(status: AgentStatus): boolean {
   return status === 'waiting' || status === 'error';
 }
 
+function formatCost(usd: number): string {
+  if (usd < 0.01) return '$0.00';
+  return `$${usd.toFixed(2)}`;
+}
+
+function formatTokenCount(tokens: number): string {
+  if (tokens >= 1_000_000) {
+    return `${(tokens / 1_000_000).toFixed(1)}M`;
+  }
+  if (tokens >= 1_000) {
+    return `${(tokens / 1_000).toFixed(1)}K`;
+  }
+  return String(tokens);
+}
+
 export default function AgentPanel({ agents, onAgentClick, collapsed }: AgentPanelProps) {
   // Tick every second to keep elapsed times updated
   const [, setTick] = useState(0);
@@ -136,8 +151,19 @@ export default function AgentPanel({ agents, onAgentClick, collapsed }: AgentPan
                 </span>
               )}
             </div>
-            {/* Phase 12 placeholder: token/cost will go here */}
-            <div className="agent-card-token-placeholder" />
+            {agent.tokenUsage && agent.tokenUsage.costUSD > 0 && (
+              <div className="agent-card-tokens">
+                <span className="agent-card-cost">
+                  {formatCost(agent.tokenUsage.costUSD)}
+                </span>
+                <span className="agent-card-token-sep">{'\u00B7'}</span>
+                <span className="agent-card-token-count">
+                  {formatTokenCount(
+                    agent.tokenUsage.inputTokens + agent.tokenUsage.outputTokens
+                  )} tokens
+                </span>
+              </div>
+            )}
           </button>
         ))}
       </div>
