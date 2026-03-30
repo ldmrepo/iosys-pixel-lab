@@ -74,6 +74,10 @@ Plans:
 
 **Goal**: 엔진이 확장 맵과 다중 존을 렌더링할 수 있도록 개선
 **Requirements**: R5.1, R5.2, R5.5
+**Plans:** 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md — 6존 컬러 시스템 교체 + walkableMask 검증 + 카메라 확인
 
 **Files**:
 - `src/engine/TileMap.ts` — 존 컬러 시스템 리팩터
