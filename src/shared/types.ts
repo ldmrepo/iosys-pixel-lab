@@ -73,6 +73,7 @@ export interface FurnitureObject {
   walkableMask?: boolean[];
   sprite: ObjectSpriteRef;
   drawOffsetY?: number;
+  drawOffsetX?: number;   // horizontal pixel offset for centering
   renderWidth?: number;   // display width in world pixels (overrides sprite region sw)
   renderHeight?: number;  // display height in world pixels (overrides sprite region sh)
   seatId?: string;

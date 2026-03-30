@@ -131,6 +131,9 @@ export class PixelOfficeEngine {
   // ─── State ───
   private initialized: boolean = false;
 
+  // ─── Debug ───
+  private _debug: boolean = false;
+
   // ─── Pending agents (queued before initialization) ───
   private pendingAgents: AgentState[] = [];
 
@@ -173,6 +176,14 @@ export class PixelOfficeEngine {
   /** Stop the game loop. */
   stop(): void {
     this.gameLoop.stop();
+  }
+
+  /** Toggle debug mode (show furniture IDs on canvas). */
+  setDebug(enabled: boolean): void {
+    this._debug = enabled;
+    if (this.objectRenderer) {
+      this.objectRenderer.debug = enabled;
+    }
   }
 
   /** Update an existing agent's state. */
@@ -357,6 +368,7 @@ export class PixelOfficeEngine {
 
     // Setup ObjectRenderer for multi-tile furniture
     this.objectRenderer = new ObjectRenderer(this.layout.tileSize);
+    this.objectRenderer.debug = this._debug;
     if (this.manifest.furnitureSheets) {
       await this.objectRenderer.loadSheets(this.manifest.furnitureSheets);
     }

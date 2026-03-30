@@ -22,6 +22,9 @@ export class ObjectRenderer {
   /** Tile size in world pixels. */
   private tileSize: number;
 
+  /** Debug mode: show object IDs on canvas. */
+  debug = false;
+
   constructor(tileSize: number) {
     this.tileSize = tileSize;
   }
@@ -83,7 +86,7 @@ export class ObjectRenderer {
 
     // World position: tile origin with optional vertical offset
     // drawOffsetY shifts the sprite upward (e.g., tall bookshelf drawn above its footprint)
-    const worldX = obj.tileX * this.tileSize;
+    const worldX = obj.tileX * this.tileSize + (obj.drawOffsetX ?? 0);
     const worldY = obj.tileY * this.tileSize - (obj.drawOffsetY ?? 0);
 
     // Convert to screen coordinates
@@ -98,6 +101,30 @@ export class ObjectRenderer {
       sx, sy, sw, sh,
       screenPos.x, screenPos.y, drawWidth, drawHeight,
     );
+
+    // Debug: draw object ID label (small text)
+    if (this.debug) {
+      const label = obj.id;
+      const fontSize = Math.max(5, 6 * camera.zoom);
+      ctx.font = `${fontSize}px monospace`;
+      ctx.textAlign = 'center';
+      const labelX = screenPos.x + drawWidth / 2;
+      const labelY = screenPos.y + drawHeight - 2 * camera.zoom;
+      // Background
+      const metrics = ctx.measureText(label);
+      const pad = 1;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(
+        labelX - metrics.width / 2 - pad,
+        labelY - fontSize / 2 - pad,
+        metrics.width + pad * 2,
+        fontSize + pad * 2,
+      );
+      // Text
+      ctx.fillStyle = '#00ff00';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, labelX, labelY);
+    }
   }
 
   /**

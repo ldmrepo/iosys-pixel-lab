@@ -120,13 +120,13 @@ if (tiles.length !== 24 || tiles[0].length !== 30) {
 // Phase 1: 91 entries preserved exactly as-is
 const SPRITES = {
   // Desks — Kitchen1-Sheet (96x96 cells, one per column)
-  DESK_TOP:     { sheetId: 'kitchen1', region: { sx: 384, sy: 0, sw: 96, sh: 96 } },
-  DESK_BOT:     { sheetId: 'kitchen1', region: { sx: 480, sy: 0, sw: 96, sh: 96 } },
+  DESK_TOP:     { sheetId: 'cupboard', region: { sx: 78, sy: 18, sw: 37, sh: 30 } },
+  DESK_BOT:     { sheetId: 'cupboard', region: { sx: 142, sy: 18, sw: 35, sh: 30 } },
   // Chairs — Kitchen1: 96x96 cells, one per column
-  CHAIR_UP:     { sheetId: 'kitchen1', region: { sx:   0, sy: 0, sw: 96, sh: 96 } },
-  CHAIR_LEFT:   { sheetId: 'kitchen1', region: { sx: 192, sy: 0, sw: 96, sh: 96 } },
-  CHAIR_DOWN:   { sheetId: 'kitchen1', region: { sx:  96, sy: 0, sw: 96, sh: 96 } },
-  CHAIR_RIGHT:  { sheetId: 'kitchen1', region: { sx: 288, sy: 0, sw: 96, sh: 96 } },
+  CHAIR_UP:     { sheetId: 'kitchen1', region: { sx:  42, sy:  7, sw: 12, sh: 25 } },
+  CHAIR_LEFT:   { sheetId: 'kitchen1', region: { sx: 232, sy:  9, sw: 14, sh: 23 } },
+  CHAIR_DOWN:   { sheetId: 'kitchen1', region: { sx: 138, sy: 12, sw: 12, sh: 20 } },
+  CHAIR_RIGHT:  { sheetId: 'kitchen1', region: { sx: 330, sy:  9, sw: 14, sh: 23 } },
   // Monitor / TV — 64x96 cell
   MONITOR:      { sheetId: 'tv',       region: { sx: 128, sy: 0, sw: 64, sh: 96 } },
   // Sofa — LivingRoom1: first row is blue sofa-front (80x48)
@@ -280,74 +280,49 @@ const seats: Seat[] = [];
 let seatId = 1;
 
 /**
- * Island Pod: single column of 2 desks;
- * top desk faces south (chairs below), bottom desk faces north (chairs above).
- * Pod footprint: 2 tiles wide x 5 tiles tall (sy to sy+4).
- * Produces 4 seats per pod.
+ * Desk Row: N single desks in a horizontal row.
+ * Each desk = 1 desk surface + 1 monitor + 1 chair = 1 seat.
+ * Desk at y, chair at y+1 centered below desk (character faces DOWN/forward).
  */
-function createPod(sx: number, sy: number, prefix: string) {
-  const dx = sx;
-
-  // Top desk (facing south)
-  furniture.push({
-    id: `desk-${prefix}-top-0`, type: 'desk',
-    tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
-    walkableMask: [false, false],
-    sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
-  });
-  furniture.push({
-    id: `mon-${prefix}-top-0`, type: 'monitor',
-    tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
-    walkableMask: [false, false],
-    sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
-  });
-  for (let c = 0; c < 2; c++) {
+function createDeskRow(startX: number, y: number, count: number, prefix: string) {
+  const spacing = 3; // 2-tile desk + 1-tile gap
+  for (let i = 0; i < count; i++) {
+    const x = startX + i * spacing;
     const id = `s${seatId++}`;
+    // All visuals centered on character position (tileX=x → worldX = x*16+8)
+    // Desk: 32px wide, center at x*16+8 → drawOffsetX = 8-16 = -8
+    furniture.push({
+      id: `desk-${prefix}-${i}`, type: 'desk',
+      tileX: x, tileY: y, widthTiles: 2, heightTiles: 1,
+      walkableMask: [false, false],
+      sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 20, drawOffsetY: 4, drawOffsetX: -8,
+    });
+    // Monitor: 24px wide, center at x*16+8 → drawOffsetX = 8-12 = -4
+    furniture.push({
+      id: `mon-${prefix}-${i}`, type: 'monitor',
+      tileX: x, tileY: y, widthTiles: 2, heightTiles: 1,
+      walkableMask: [false, false],
+      sprite: SPRITES.MONITOR, renderWidth: 24, renderHeight: 12, drawOffsetY: 8, drawOffsetX: -4, sortY: y - 1,
+    });
+    // Chair: 10px wide, center at x*16+8 → drawOffsetX = 8-5 = 3
     furniture.push({
       id: `chair-${id}`, type: 'chair',
-      tileX: dx + c, tileY: sy + 1, widthTiles: 1, heightTiles: 1,
+      tileX: x, tileY: y - 1, widthTiles: 1, heightTiles: 1,
       walkableMask: [true],
-      sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
+      sprite: SPRITES.CHAIR_DOWN, renderWidth: 10, renderHeight: 14, seatId: id,
+      drawOffsetY: 0, drawOffsetX: 3, sortY: y - 2,
     });
-    seats.push({ id, tileX: dx + c, tileY: sy + 1, deskTileX: dx, deskTileY: sy, facing: 'down' });
-  }
-
-  // Bottom desk (facing north)
-  const bdy = sy + 3;
-  furniture.push({
-    id: `desk-${prefix}-bot-0`, type: 'desk',
-    tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
-    walkableMask: [false, false],
-    sprite: SPRITES.DESK_BOT, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
-  });
-  furniture.push({
-    id: `mon-${prefix}-bot-0`, type: 'monitor',
-    tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
-    walkableMask: [false, false],
-    sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
-  });
-  for (let c = 0; c < 2; c++) {
-    const id = `s${seatId++}`;
-    furniture.push({
-      id: `chair-${id}`, type: 'chair',
-      tileX: dx + c, tileY: bdy - 1, widthTiles: 1, heightTiles: 1,
-      walkableMask: [true],
-      sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
-    });
-    seats.push({ id, tileX: dx + c, tileY: bdy - 1, deskTileX: dx, deskTileY: bdy, facing: 'up' });
+    seats.push({ id, tileX: x, tileY: y - 1, deskTileX: x, deskTileY: y, facing: 'down' });
   }
 }
 
-// ── Work Zone A: 3 pods, 12 seats (ZONES.workA: x=9..28, y=1..9) ──
-createPod(10, 2, 'A1');   // pod at x:10-11, y:2-6, seats s1-s4
-createPod(15, 2, 'A2');   // pod at x:15-16, y:2-6, seats s5-s8
-createPod(20, 2, 'A3');   // pod at x:20-21, y:2-6, seats s9-s12
+// ── Work Zone A: 1 row × 6 desks = 6 seats (ZONES.workA: x=9..28, y=1..9) ──
+createDeskRow(10, 5, 6, 'A');   // desks at y:5, chairs at y:4
 
-// ── Work Zone B: 2 pods, 8 seats (ZONES.workB: x=1..14, y=11..15) ──
-createPod(3, 11, 'B1');   // pod at x:3-4, y:11-15, seats s13-s16
-createPod(9, 11, 'B2');   // pod at x:9-10, y:11-15, seats s17-s20
+// ── Work Zone B: 1 row × 4 desks = 4 seats (ZONES.workB: x=1..14, y=11..15) ──
+createDeskRow(2, 13, 4, 'B');   // desks at y:13, chairs at y:12
 
-// Total seat count: 12 (Zone A) + 8 (Zone B) = 20 seats
+// Total seat count: 6 + 4 = 10 seats
 
 // ── Server Room (ZONES.server: x=1..8, y=1..9) ──
 // 4 server racks in 2 rows with a 1-tile aisle at y=5
@@ -418,37 +393,37 @@ furniture.push({
   id: 'chair-mtg-n0', type: 'chair',
   tileX: 16, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 furniture.push({
   id: 'chair-mtg-n1', type: 'chair',
   tileX: 18, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 furniture.push({
   id: 'chair-mtg-n2', type: 'chair',
   tileX: 20, tileY: 11, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_DOWN, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 furniture.push({
   id: 'chair-mtg-s0', type: 'chair',
   tileX: 16, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 furniture.push({
   id: 'chair-mtg-s1', type: 'chair',
   tileX: 18, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 furniture.push({
   id: 'chair-mtg-s2', type: 'chair',
   tileX: 20, tileY: 13, widthTiles: 1, heightTiles: 1,
   walkableMask: [true],
-  sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, drawOffsetY: 8,
+  sprite: SPRITES.CHAIR_UP, renderWidth: 10, renderHeight: 14, drawOffsetY: 0,
 });
 
 // Meeting room TV (wall-mounted on north partition wall row y=10)
