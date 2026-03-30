@@ -23,9 +23,9 @@ decisions:
   - "Sub-agent wander radius: 5-tile Manhattan distance from parent tile position"
   - "Despawn cleanup: deferred to update loop via toRemove array — avoids Map mutation during iteration"
 metrics:
-  duration: "~3 minutes"
+  duration: "~5 minutes"
   completed_date: "2026-03-30"
-  tasks_completed: 1
+  tasks_completed: 2
   tasks_total: 2
   files_created: 1
   files_modified: 2
@@ -37,7 +37,7 @@ metrics:
 
 ## What Was Built
 
-Task 1 of 2 completed. Human visual verification (Task 2) is pending as a checkpoint.
+All 2 tasks completed. Task 2 (visual verification checkpoint) approved by user.
 
 ### MatrixEffect.ts (new)
 
@@ -81,6 +81,12 @@ None — plan executed exactly as written.
 
 All created files verified present. Commit 28a5e93 verified in git log. TypeScript 0 errors confirmed.
 
-## Pending
+## Task 2: Visual Verification
 
-Task 2 (checkpoint:human-verify) — visual verification of sub-agent lifecycle in the browser requires human review.
+**Status:** APPROVED
+
+Human verified all sub-agent visualization scenarios:
+- Sub-agent spawns near parent with column-by-column Matrix materializing effect
+- Sub-agent inherits parent's sprite sheet (same team visual)
+- Sub-agent wanders near parent desk area
+- Despawn plays reverse column fade-out and character is removed
