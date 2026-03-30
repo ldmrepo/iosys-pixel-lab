@@ -105,14 +105,10 @@ export class TileMap {
     const ts = this.layout.tileSize;
     const visible = camera.getVisibleRect();
 
-    // Determine the range of tiles visible
     const startCol = Math.max(0, Math.floor(visible.left / ts));
     const endCol = Math.min(this.layout.width - 1, Math.ceil(visible.right / ts));
     const startRow = Math.max(0, Math.floor(visible.top / ts));
     const endRow = Math.min(this.layout.height - 1, Math.ceil(visible.bottom / ts));
-
-    // If sprite sheet is loaded, use it. Otherwise draw colored rectangles as fallback.
-    const useSpriteSheet = this.spriteSheet.isLoaded;
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
@@ -120,40 +116,32 @@ export class TileMap {
         const worldX = col * ts;
         const worldY = row * ts;
 
-        // Convert to screen coordinates
         const screen = camera.worldToScreen(worldX, worldY);
-        const screenSize = ts * camera.zoom;
+        const nextScreen = camera.worldToScreen(worldX + ts, worldY + ts);
+        const exactWidth = Math.round(nextScreen.x) - Math.round(screen.x);
+        const exactHeight = Math.round(nextScreen.y) - Math.round(screen.y);
 
-        if (useSpriteSheet) {
-          ctx.save();
-          // Scale the sprite to match zoomed tile size
-          this.spriteSheet.drawFrame(
-            ctx,
-            tile.spriteIndex,
-            screen.x,
-            screen.y,
-            camera.zoom
-          );
-          ctx.restore();
+        const dx = Math.round(screen.x);
+        const dy = Math.round(screen.y);
+
+        if (tile.type === 'wall') {
+          // ── Wall tile: dark wainscot base + lighter upper band ──
+          ctx.fillStyle = '#2c1f14';
+          ctx.fillRect(dx, dy, exactWidth, exactHeight);
+          // Top highlight band (baseboard inside of wall)
+          ctx.fillStyle = '#4a3222';
+          ctx.fillRect(dx, dy, exactWidth, Math.max(2, Math.round(exactHeight * 0.35)));
         } else {
-          // Fallback: colored rectangles based on tile type
-          ctx.fillStyle = this.getFallbackColor(tile);
-          ctx.fillRect(
-            Math.round(screen.x),
-            Math.round(screen.y),
-            Math.ceil(screenSize),
-            Math.ceil(screenSize)
-          );
-
-          // Draw grid lines for visual clarity
-          ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(
-            Math.round(screen.x),
-            Math.round(screen.y),
-            Math.ceil(screenSize),
-            Math.ceil(screenSize)
-          );
+          // ── Floor tiles: color by zone (spriteIndex = zone id) ──
+          ctx.fillStyle = this.getZoneColor(tile.spriteIndex);
+          ctx.fillRect(dx, dy, exactWidth, exactHeight);
+          // Subtle plank lines (use light overlay on dark zones, dark on light)
+          const isDarkZone = tile.spriteIndex === 3; // server room
+          ctx.fillStyle = isDarkZone ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
+          const gap1 = Math.round(exactHeight * 0.33);
+          const gap2 = Math.round(exactHeight * 0.66);
+          ctx.fillRect(dx, dy + gap1, exactWidth, 1);
+          ctx.fillRect(dx, dy + gap2, exactWidth, 1);
         }
       }
     }
@@ -165,15 +153,31 @@ export class TileMap {
     this.cache = null;
   }
 
-  /** Get a fallback color for tile types when sprites are not loaded. */
+  /**
+   * Zone floor colors keyed by spriteIndex (= ZONE_INDEX[zone] from types.ts).
+   *   0 = corridor  (#d4c8b0 — light beige)
+   *   1 = work      (#a0744a — medium brown)
+   *   2 = lounge    (#b8895a — warm mid-tone)
+   *   3 = server    (#2a2a3a — dark navy)
+   *   4 = meeting   (#3a6b4a — forest green)
+   *   5 = lobby     (#e8e0d0 — cream)
+   */
+  private static readonly ZONE_COLORS: Record<number, string> = {
+    0: '#d4c8b0',
+    1: '#a0744a',
+    2: '#b8895a',
+    3: '#2a2a3a',
+    4: '#3a6b4a',
+    5: '#e8e0d0',
+  };
+
+  private getZoneColor(spriteIndex: number): string {
+    return TileMap.ZONE_COLORS[spriteIndex] ?? '#a0744a';
+  }
+
+  /** Fallback (unused but kept for API compatibility) */
   private getFallbackColor(tile: TileInfo): string {
-    switch (tile.type) {
-      case 'floor':
-        return '#e8dcc8';
-      case 'wall':
-        return '#8b7355';
-      default:
-        return '#cccccc';
-    }
+    return tile.type === 'wall' ? '#2c1f14' : '#a0744a';
   }
 }
+

@@ -503,6 +503,19 @@ export class PixelOfficeEngine {
     }
 
     console.log(`[Engine] Cached ${this.walkableTiles.length} walkable tiles, ${this.breakTiles.length} break tiles`);
+
+    // Verify all furniture mask lengths match footprint
+    if (furniture) {
+      for (const obj of furniture) {
+        const expected = obj.widthTiles * obj.heightTiles;
+        if (obj.walkableMask && obj.walkableMask.length !== expected) {
+          console.warn(
+            `[Engine] walkableMask length mismatch on "${obj.id}": ` +
+            `expected ${expected}, got ${obj.walkableMask.length}`
+          );
+        }
+      }
+    }
   }
 
   private getCharacterSpriteSheet(agentId: string): SpriteSheet {
