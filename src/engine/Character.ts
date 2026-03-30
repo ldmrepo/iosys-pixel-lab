@@ -71,6 +71,12 @@ export class Character {
   /** Global time accumulator for bubble animation. */
   private globalTime: number = 0;
 
+  /** Bubble state for speech bubble rendering. */
+  private bubbleDismissed: boolean = false;
+  private bubbleFadeStart: number = 0;    // timestamp when fade-out begins
+  private bubbleFadeAlpha: number = 1.0;  // current opacity (1.0 = fully visible)
+  private lastBubbleType: 'permission' | 'waiting' | null = null;
+
   /** Current facing direction, updated during path movement. */
   private currentDirection: 'down' | 'up' | 'left' | 'right' = 'down';
 
@@ -120,6 +126,15 @@ export class Character {
       if (this.behavior) {
         this.behavior.onStatusChange(newState.status);
       }
+    }
+
+    // Reset bubble dismiss when bubble type changes
+    const newBubbleType = newState.permissionPending ? 'permission' : (newState.status === 'waiting' ? 'waiting' : null);
+    if (newBubbleType !== this.lastBubbleType) {
+      this.bubbleDismissed = false;
+      this.bubbleFadeAlpha = 1.0;
+      this.bubbleFadeStart = 0;
+      this.lastBubbleType = newBubbleType;
     }
   }
 
@@ -388,71 +403,110 @@ export class Character {
     ctx.fillText(name, Math.round(cx), Math.round(labelY));
   }
 
-  /** Render status speech bubble for waiting/done/error states. */
+  /** Render pixel-art speech bubble for permissionPending and waiting states. */
   private renderStatusBubble(
     ctx: CanvasRenderingContext2D,
     cx: number,
     topY: number,
     scale: number
   ): void {
-    const status = this.state.status; // Use actual status for bubbles (not effective)
-    if (status !== 'waiting' && status !== 'done' && status !== 'error') {
-      return;
+    // Determine bubble type: permissionPending takes priority over status=waiting
+    const bubbleType = this.state.permissionPending ? 'permission' : (this.state.status === 'waiting' ? 'waiting' : null);
+    if (!bubbleType) return;
+
+    // If bubble was dismissed by click, do not render
+    if (this.bubbleDismissed) return;
+
+    // Manage fade-out for waiting bubble
+    let alpha = 1.0;
+    if (bubbleType === 'waiting') {
+      // Start the fade timer on the first render frame
+      if (this.bubbleFadeStart === 0) {
+        this.bubbleFadeStart = this.globalTime;
+      }
+      const elapsed = this.globalTime - this.bubbleFadeStart;
+      if (elapsed > 2.0) {
+        // Fully faded — stop rendering
+        return;
+      }
+      if (elapsed > 1.5) {
+        // Last 0.5s: fade from 1.0 to 0.0
+        alpha = 1.0 - (elapsed - 1.5) / 0.5;
+      }
+      this.bubbleFadeAlpha = alpha;
     }
 
-    // Bounce animation offset
-    const bounceY = Math.sin(this.globalTime * 3) * 1.5 * scale;
-    const bubbleY = topY - 14 * scale + bounceY;
+    // Bubble dimensions (pixel-art 11x10 sprite style)
+    const bw = 11 * scale;
+    const bh = 10 * scale;
 
-    const bubbleSize = Math.max(8, Math.round(8 * scale));
-    const halfBubble = bubbleSize / 2;
+    // Position: centered horizontally on cx, above name label
+    // Permission bubble bounces; waiting is static for clean fade
+    const bounceY = bubbleType === 'permission' ? Math.sin(this.globalTime * 3) * 1.5 * scale : 0;
+    const bx = cx - bw / 2;
+    const by = topY - 18 * scale + bounceY;
 
-    // Bubble background
-    if (status === 'waiting') {
-      ctx.fillStyle = '#ffd700'; // Yellow
-    } else if (status === 'done') {
-      ctx.fillStyle = '#32cd32'; // Green
-    } else {
-      // Error: blink between red and dark red
-      const blink = Math.sin(this.globalTime * 8) > 0;
-      ctx.fillStyle = blink ? '#ff4444' : '#cc0000';
-    }
+    // Colors
+    const bgColor     = bubbleType === 'permission' ? '#D97706' : '#16A34A';
+    const borderColor = bubbleType === 'permission' ? '#92400E' : '#14532D';
 
-    // Draw rounded bubble
-    this.drawRoundedRect(
-      ctx,
-      Math.round(cx - halfBubble),
-      Math.round(bubbleY - halfBubble),
-      bubbleSize,
-      bubbleSize,
-      3 * scale
-    );
+    const prevAlpha = ctx.globalAlpha;
+    ctx.globalAlpha = prevAlpha * alpha;
+
+    // 1. Draw bubble border (outer rect, 1px larger on each side)
+    ctx.fillStyle = borderColor;
+    this.drawRoundedRect(ctx, bx - 1 * scale, by - 1 * scale, bw + 2 * scale, bh + 2 * scale, 2 * scale);
     ctx.fill();
 
-    // Draw bubble pointer (small triangle)
+    // 2. Draw bubble body
+    ctx.fillStyle = bgColor;
+    this.drawRoundedRect(ctx, bx, by, bw, bh, 1 * scale);
+    ctx.fill();
+
+    // 3. Draw pointer triangle (3px wide, 3px tall, pointing down from bubble bottom center)
+    ctx.fillStyle = bgColor;
     ctx.beginPath();
-    ctx.moveTo(cx - 2 * scale, bubbleY + halfBubble);
-    ctx.lineTo(cx, bubbleY + halfBubble + 3 * scale);
-    ctx.lineTo(cx + 2 * scale, bubbleY + halfBubble);
+    ctx.moveTo(cx - 1.5 * scale, by + bh);
+    ctx.lineTo(cx, by + bh + 3 * scale);
+    ctx.lineTo(cx + 1.5 * scale, by + bh);
     ctx.closePath();
     ctx.fill();
+    // Border for pointer
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1 * scale;
+    ctx.beginPath();
+    ctx.moveTo(cx - 1.5 * scale, by + bh);
+    ctx.lineTo(cx, by + bh + 3 * scale);
+    ctx.lineTo(cx + 1.5 * scale, by + bh);
+    ctx.stroke();
 
-    // Draw icon text
-    ctx.fillStyle = '#ffffff';
-    const iconFontSize = Math.max(6, Math.round(6 * scale));
-    ctx.font = `bold ${iconFontSize}px monospace`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    if (status === 'waiting') {
-      ctx.fillText('?', Math.round(cx), Math.round(bubbleY));
-    } else if (status === 'done') {
-      // Checkmark
-      ctx.fillText('\u2713', Math.round(cx), Math.round(bubbleY));
+    // 4. Draw content
+    if (bubbleType === 'permission') {
+      // Three amber dots horizontally centered in bubble
+      ctx.fillStyle = '#ffffff';
+      const dotR = 1.5 * scale;
+      const dotY = by + bh / 2;
+      const dotSpacing = 3 * scale;
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.arc(cx + i * dotSpacing, dotY, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else {
-      // Error exclamation
-      ctx.fillText('!', Math.round(cx), Math.round(bubbleY));
+      // Green checkmark: short down-right stroke + longer up-right stroke
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      // Start at left, go down-right (short leg), then up-right (long leg)
+      ctx.moveTo(cx - 2.5 * scale, by + bh / 2);
+      ctx.lineTo(cx - 0.5 * scale, by + bh / 2 + 2 * scale);
+      ctx.lineTo(cx + 3 * scale, by + bh / 2 - 2.5 * scale);
+      ctx.stroke();
     }
+
+    ctx.globalAlpha = prevAlpha;
   }
 
   /** Draw a rounded rectangle path. */
@@ -517,5 +571,30 @@ export class Character {
       screenY >= drawY &&
       screenY <= drawY + fh
     );
+  }
+
+  /** Check if a screen-space point hits the speech bubble area. Returns true if bubble is visible and point is within bounds. */
+  bubbleHitTest(screenX: number, screenY: number, camera: Camera): boolean {
+    // Determine if bubble is currently visible
+    const bubbleType = this.state.permissionPending ? 'permission' : (this.state.status === 'waiting' ? 'waiting' : null);
+    if (!bubbleType || this.bubbleDismissed) return false;
+    if (bubbleType === 'waiting' && this.bubbleFadeAlpha <= 0) return false;
+
+    const screen = camera.worldToScreen(this.worldX, this.worldY);
+    const scale = camera.zoom;
+    const fh = this.spriteSheet.frameHeight * scale;
+    const drawY = screen.y - fh + (this.tileSize * scale) / 2;
+
+    const bw = 11 * scale;
+    const bh = 10 * scale;
+    const bx = screen.x - bw / 2;
+    const by = drawY - 18 * scale; // same offset as rendering (no bounce for hit-test)
+
+    return screenX >= bx && screenX <= bx + bw && screenY >= by && screenY <= by + bh + 3 * scale;
+  }
+
+  /** Dismiss the current speech bubble (called on click). */
+  dismissBubble(): void {
+    this.bubbleDismissed = true;
   }
 }
