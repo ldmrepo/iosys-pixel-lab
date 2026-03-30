@@ -3,7 +3,8 @@
 ## Milestones
 
 - ✅ **v1.0 Office Space Rebuild** - Phases 1-5 (shipped 2026-03-30)
-- 🚧 **v1.1 Dynamic Agents** - Phases 6-10 (in progress)
+- ✅ **v1.1 Dynamic Agents** - Phases 6-10 (shipped 2026-03-30)
+- 🚧 **v1.2 Dashboard & Polish** - Phases 11-13 (in progress)
 
 ## Phases
 
@@ -47,21 +48,12 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Dynamic Agents (In Progress)
-
-**Milestone Goal:** 정적 오피스를 살아있는 에이전트 공간으로 전환 — 캐릭터가 자율 이동하고, 에이전트 상태를 실시간으로 시각화하며, 서브에이전트가 동적으로 스폰/디스폰된다.
-
-## Phase Details
+<details>
+<summary>✅ v1.1 Dynamic Agents (Phases 6-10) - SHIPPED 2026-03-30</summary>
 
 ### Phase 6: Movement Engine
 **Goal**: 캐릭터가 오피스를 자율적으로 이동할 수 있는 FSM과 BFS 경로탐색 엔진을 갖춘다
-**Depends on**: Phase 5
-**Requirements**: MOVE-01, MOVE-02, MOVE-07
-**Success Criteria** (what must be TRUE):
-  1. 캐릭터가 idle / walk / type 세 상태 사이를 전환하며, 상태마다 올바른 스프라이트 애니메이션이 재생된다
-  2. 캐릭터가 출발지에서 목적지까지 4방향 BFS 경로를 계산하고 장애물을 우회하며 타일 단위로 이동한다
-  3. 캐릭터가 자기 좌석을 목적지로 삼을 때 해당 타일을 임시 walkable로 처리하여 도달할 수 있다
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
 - [x] 06-01-PLAN.md — 4방향 walk 스프라이트시트 확장 + 엔진 방향 시스템 구현
@@ -69,71 +61,85 @@ Plans:
 
 ### Phase 7: Character Behavior
 **Goal**: 캐릭터가 에이전트 활성 상태에 따라 좌석으로 걸어가거나 사무실을 배회하며, 도구별 애니메이션이 분기된다
-**Depends on**: Phase 6
-**Requirements**: MOVE-03, MOVE-04, MOVE-05, MOVE-06
-**Success Criteria** (what must be TRUE):
-  1. 에이전트가 활성화되면 캐릭터가 배정된 좌석까지 BFS 경로로 걸어간 뒤 작업 자세를 취한다
-  2. 에이전트가 비활성 상태일 때 캐릭터가 2~20초 대기 → 랜덤 이동 → 좌석 복귀 루프를 반복한다
-  3. Read/Grep 도구 사용 중에는 reading 애니메이션이, Write/Edit 도구 사용 중에는 typing 애니메이션이 재생된다
-  4. 캐릭터 걷기 애니메이션이 이동 방향(상하좌우)에 맞춰 4프레임으로 재생된다
 **Plans**: 1/1 plans complete
 
 Plans:
-- [x] 07-01-PLAN.md — Pixel Agents 타이밍 튜닝 + 전체 E2E 검증 (좌석 이동, 배회, 도구 애니메이션, 방향 걷기)
+- [x] 07-01-PLAN.md — Pixel Agents 타이밍 튜닝 + 전체 E2E 검증
 
 ### Phase 8: State Detection
 **Goal**: 서버가 JSONL 스트림에서 턴 종료·권한 요청·백그라운드 에이전트 상태를 확정적으로 감지한다
-**Depends on**: Phase 5
-**Requirements**: DETECT-01, DETECT-02, DETECT-03, DETECT-04, DETECT-05
-**Success Criteria** (what must be TRUE):
-  1. turn_duration 레코드 수신 시 즉시 턴 종료 이벤트가 발행되고 클라이언트에 전달된다
-  2. 비면제 도구 호출 후 7초간 응답이 없으면 permission 상태로 전환된다
-  3. 새 JSONL 데이터 수신 시 진행 중인 permission/waiting 타이머가 즉시 취소된다
-  4. run_in_background 도구 호출이 queue-operation 이벤트로 파싱되어 별도 추적된다
-  5. 텍스트 전용 턴에서 5초 미활동 시 waiting 상태로 전환된다
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
-- [ ] 08-01-PLAN.md — 타입 확장 + turn_duration 파서 + per-agent 타이머 인프라 + text-idle 5s
-- [ ] 08-02-PLAN.md — Background agent 추적 + 타이머 취소 검증 + E2E 통합 확인
+- [x] 08-01-PLAN.md — 타입 확장 + turn_duration 파서 + per-agent 타이머 인프라 + text-idle 5s
+- [x] 08-02-PLAN.md — Background agent 추적 + 타이머 취소 검증 + E2E 통합 확인
 
 ### Phase 9: Visual Feedback
 **Goal**: 캐릭터 위에 상태별 말풍선이 표시되고 턴 종료 시 사운드 알림이 재생된다
-**Depends on**: Phase 8
-**Requirements**: VISUAL-01, VISUAL-02, VISUAL-03, VISUAL-04, VISUAL-05
-**Success Criteria** (what must be TRUE):
-  1. Permission 상태 진입 시 캐릭터 위에 호박색 "..." 말풍선이 나타난다
-  2. 턴 종료 시 녹색 체크마크 말풍선이 나타났다가 2초 후 페이드아웃된다
-  3. 말풍선을 클릭하면 즉시 닫힌다
-  4. 턴 종료 시 E5→E6 2음 차임이 Web Audio API로 재생된다
-  5. 화면 상단 사운드 토글 버튼으로 차임 on/off를 전환할 수 있고 설정이 유지된다
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
-- [ ] 09-01-PLAN.md — Pixel-art speech bubble renderer (permission amber "..." + waiting green checkmark + fade-out + click dismiss)
-- [ ] 09-02-PLAN.md — Web Audio E5-E6 chime + SoundToggle React component + localStorage persistence
+- [x] 09-01-PLAN.md — Pixel-art speech bubble renderer (permission + waiting + fade-out + click dismiss)
+- [x] 09-02-PLAN.md — Web Audio E5-E6 chime + SoundToggle React component + localStorage persistence
 
 ### Phase 10: Sub-Agents
 **Goal**: Task/Agent 도구 실행 시 서브에이전트 캐릭터가 부모 근처에 스폰되고 작업 완료 시 Matrix 이펙트와 함께 디스폰된다
-**Depends on**: Phase 6, Phase 8
-**Requirements**: SUB-01, SUB-02, SUB-03, SUB-04, SUB-05
-**Success Criteria** (what must be TRUE):
-  1. Task/Agent 도구의 progress 레코드가 파싱되어 서브에이전트 스폰 이벤트가 발행된다
-  2. 서브에이전트가 부모 캐릭터 근처 walkable 타일에 음수 ID 캐릭터로 즉시 나타난다
-  3. 서브에이전트가 부모의 팔레트/색상을 상속하여 팀 소속을 시각적으로 표현한다
-  4. 스폰과 디스폰 시 Matrix 스타일 컬럼별 stagger 이펙트가 재생된다
-  5. 서브에이전트 작업 완료 시 캐릭터가 자동으로 제거된다
-**Plans**: 2 plans
+**Plans**: 2/2 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md — Type extensions + parser sub-agent event + state machine sub-agent lifecycle (SUB-01, SUB-05)
-- [ ] 10-02-PLAN.md — MatrixEffect renderer + palette inheritance + BFS spawn + sub-agent behavior + visual verification (SUB-02, SUB-03, SUB-04)
+- [x] 10-01-PLAN.md — Type extensions + parser sub-agent event + state machine sub-agent lifecycle
+- [x] 10-02-PLAN.md — MatrixEffect renderer + palette inheritance + BFS spawn + sub-agent behavior + visual verification
+
+</details>
+
+### 🚧 v1.2 Dashboard & Polish (In Progress)
+
+**Milestone Goal:** UX 레이어 강화 — 대시보드 사이드 패널로 에이전트 상태를 한눈에 파악하고, 토큰/비용을 실시간 추적하며, 새 에셋팩으로 오피스 비주얼을 업그레이드한다.
+
+- [ ] **Phase 11: Layout & Dashboard Panel** - 안정적인 3열 레이아웃 위에 에이전트 상태/계층/세션 패널 구축
+- [ ] **Phase 12: Token & Cost Tracking** - JSONL turn_duration 기반 토큰 파이프라인 + 에이전트 카드 비용 표시
+- [ ] **Phase 13: Asset Replacement** - PixelOffice/Pixel Life 에셋팩으로 오피스 전면 교체 + 엔진 호환성 검증
+
+## Phase Details
+
+### Phase 11: Layout & Dashboard Panel
+**Goal**: Canvas와 사이드 패널이 안정적으로 공존하는 3열 레이아웃을 구축하고, 에이전트별 상태/도구/계층/세션 정보를 패널에 표시한다
+**Depends on**: Phase 10
+**Requirements**: DASH-05, DASH-01, DASH-02, DASH-03
+**Success Criteria** (what must be TRUE):
+  1. 사이드 패널을 열고 닫아도 Canvas 픽셀아트가 흐려지지 않고 그대로 렌더링된다
+  2. 사이드 패널에 각 에이전트의 현재 상태(work/walk/idle/permission/waiting)와 활성 도구 이름이 표시된다
+  3. 서브에이전트가 부모 에이전트 카드 아래 들여쓰기된 행으로 표시된다
+  4. 각 에이전트 카드에 세션 시작 이후 경과 시간이 초 단위로 실시간 업데이트된다
+**Plans**: TBD
+
+### Phase 12: Token & Cost Tracking
+**Goal**: 서버가 JSONL turn_duration 엔트리에서 토큰 사용량을 누적·중복제거하여 USD 비용으로 변환하고, 에이전트 카드에 실시간 표시한다
+**Depends on**: Phase 11
+**Requirements**: TOKEN-01, TOKEN-02, TOKEN-03, TOKEN-04, DASH-04
+**Success Criteria** (what must be TRUE):
+  1. 각 에이전트 카드에 누적 입력/출력 토큰 수와 캐시 읽기 토큰 수가 표시된다
+  2. 병렬 도구 호출 시 같은 message.id가 여러 번 집계되지 않는다 (중복 카운팅 없음)
+  3. 각 에이전트 카드에 세션 누적 예상 비용(USD)이 표시된다
+  4. 브라우저 재접속 후에도 토큰 누적값이 유지된다 (서버 상태 기반)
+**Plans**: TBD
+
+### Phase 13: Asset Replacement
+**Goal**: PixelOffice와 Pixel Life 에셋팩의 스프라이트 좌표를 측정·등록하고 오피스 가구를 새 에셋으로 교체하되 기존 엔진이 정상 동작함을 검증한다
+**Depends on**: Phase 11
+**Requirements**: ASSET-01, ASSET-02, ASSET-03, ASSET-04, ASSET-05
+**Success Criteria** (what must be TRUE):
+  1. PixelOffice와 Pixel Life 스프라이트가 asset-manifest.ts에 좌표와 함께 등록되어 있다
+  2. 오피스 주요 가구(데스크, 의자, 소파 등)가 새 에셋팩 스프라이트로 렌더링된다
+  3. 교체 후 FSM 이동, BFS 경로탐색, 말풍선, 서브에이전트 이펙트가 모두 정상 동작한다
+  4. 캐릭터가 교체된 가구와 충돌하지 않고 walkable 타일을 올바르게 탐색한다
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in this order: 6 → 7 → 8 → 9 → 10
-(Phase 8 can begin in parallel with Phase 7 if desired — both depend on Phase 5, not on each other)
+Phases execute in this order: 11 → 12 → 13
+(Phase 13 can begin in parallel with Phase 12 once Phase 11 layout is stable)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -142,8 +148,11 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 3. TileMap Engine Adaptation | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 4. ObjectRenderer & Sprites | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
-| 6. Movement Engine | 2/2 | Complete   | 2026-03-30 | - |
+| 6. Movement Engine | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 7. Character Behavior | v1.1 | 1/1 | Complete | 2026-03-30 |
-| 8. State Detection | 2/2 | Complete   | 2026-03-30 | - |
-| 9. Visual Feedback | 2/2 | Complete   | 2026-03-30 | - |
-| 10. Sub-Agents | 2/2 | Complete    | 2026-03-30 | - |
+| 8. State Detection | v1.1 | 2/2 | Complete | 2026-03-30 |
+| 9. Visual Feedback | v1.1 | 2/2 | Complete | 2026-03-30 |
+| 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
+| 11. Layout & Dashboard Panel | v1.2 | 0/? | Not started | - |
+| 12. Token & Cost Tracking | v1.2 | 0/? | Not started | - |
+| 13. Asset Replacement | v1.2 | 0/? | Not started | - |

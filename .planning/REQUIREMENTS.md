@@ -60,26 +60,26 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DASH-01 | - | Pending |
-| DASH-02 | - | Pending |
-| DASH-03 | - | Pending |
-| DASH-04 | - | Pending |
-| DASH-05 | - | Pending |
-| TOKEN-01 | - | Pending |
-| TOKEN-02 | - | Pending |
-| TOKEN-03 | - | Pending |
-| TOKEN-04 | - | Pending |
-| ASSET-01 | - | Pending |
-| ASSET-02 | - | Pending |
-| ASSET-03 | - | Pending |
-| ASSET-04 | - | Pending |
-| ASSET-05 | - | Pending |
+| DASH-01 | Phase 11 | Pending |
+| DASH-02 | Phase 11 | Pending |
+| DASH-03 | Phase 11 | Pending |
+| DASH-04 | Phase 12 | Pending |
+| DASH-05 | Phase 11 | Pending |
+| TOKEN-01 | Phase 12 | Pending |
+| TOKEN-02 | Phase 12 | Pending |
+| TOKEN-03 | Phase 12 | Pending |
+| TOKEN-04 | Phase 12 | Pending |
+| ASSET-01 | Phase 13 | Pending |
+| ASSET-02 | Phase 13 | Pending |
+| ASSET-03 | Phase 13 | Pending |
+| ASSET-04 | Phase 13 | Pending |
+| ASSET-05 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after initial definition*
+*Last updated: 2026-03-30 after roadmap creation (v1.2)*
