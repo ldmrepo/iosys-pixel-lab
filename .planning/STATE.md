@@ -2,35 +2,35 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: planning
-stopped_at: Phase 7 planned — 1 plan in 1 wave ready for execution
-last_updated: "2026-03-30T14:18:05.171Z"
+status: executing
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-30T14:24:52Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
-  percent: 20
+  completed_plans: 3
+  percent: 40
 ---
 
 # STATE — v1.1 Dynamic Agents
 
 ## Current Phase
 
-**Phase 7 of 10** (v1.1) — Character Behavior
-**Status:** Ready to plan
+**Phase 8 of 10** (v1.1) — State Detection
+**Status:** Phase 07 Complete, ready for Phase 08
 
 ## Phase Status
 
 | Phase | Name | Status |
 |-------|------|--------|
 | 6 | Movement Engine | Complete (2/2 plans, E2E verified) |
-| 7 | Character Behavior | Not started |
+| 7 | Character Behavior | Complete (1/1 plans, E2E verified) |
 | 8 | State Detection | Not started |
 | 9 | Visual Feedback | Not started |
 | 10 | Sub-Agents | Not started |
 
-Progress: [██░░░░░░░░] 20% (1/5 phases)
+Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Decisions
 
@@ -42,6 +42,8 @@ Progress: [██░░░░░░░░] 20% (1/5 phases)
 - [Phase 06-movement-engine]: walk_* variants added directly to AgentStatus union so all Record<AgentStatus,...> maps remain exhaustive at compile time
 - [Phase 06-movement-engine]: workSeat uses layout.seats.find() (first unassigned seat) instead of spawn position — ensures FSM navigates to actual desk tile
 - [Phase 06-movement-engine]: setPath() resets animTime=0 and currentFrameIndex=0 so walk animation starts at frame 0 cleanly
+- [Phase 07-character-behavior]: Extracted 8 named timing constants (WANDER_PAUSE/MOVES/SEAT_REST/SEAT_LEAVE MIN/MAX) to eliminate magic number duplication across 7 call sites
+- [Phase 07-character-behavior]: seatLeaveDelay kept at 2-5s per prior user decision; only renamed to use named constants
 
 ## Accumulated Context (from v1.0)
 
@@ -58,5 +60,5 @@ Progress: [██░░░░░░░░] 20% (1/5 phases)
 
 ## Last Session
 
-Stopped at: Phase 7 planned — 1 plan in 1 wave ready for execution
-Resume: `/gsd:plan-phase 7`
+Stopped at: Completed 07-01-PLAN.md
+Resume: `/gsd:plan-phase 8`
