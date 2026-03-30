@@ -128,6 +128,9 @@ export class Character {
     if (path.length === 0) return;
     this.path = path;
     this.pathIndex = 0;
+    // Reset animation timing so walk animation starts from frame 0
+    this.animTime = 0;
+    this.currentFrameIndex = 0;
   }
 
   /** Whether the character is currently moving along a path. */

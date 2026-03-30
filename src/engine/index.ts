@@ -250,7 +250,17 @@ export class PixelOfficeEngine {
 
     // Setup behavior FSM with office context
     if (this.initialized) {
-      const workSeat = { x: state.position.x, y: state.position.y };
+      // Find an unassigned seat from the layout, or fall back to spawn position
+      const assignedSeat = this.layout.seats.find(
+        s => !s.assignedAgentId || s.assignedAgentId === state.id
+      );
+      const workSeat = assignedSeat
+        ? { x: assignedSeat.tileX, y: assignedSeat.tileY }
+        : { x: state.position.x, y: state.position.y };
+      // Mark seat as assigned to this agent
+      if (assignedSeat && !assignedSeat.assignedAgentId) {
+        assignedSeat.assignedAgentId = state.id;
+      }
       character.setBehavior({
         workSeat,
         breakTiles: this.breakTiles,
@@ -275,6 +285,11 @@ export class PixelOfficeEngine {
   /** Remove an agent from the scene. */
   removeAgent(id: string): void {
     this.characters.delete(id);
+    // Release seat assignment so future agents can use it
+    const seat = this.layout.seats.find(s => s.assignedAgentId === id);
+    if (seat) {
+      seat.assignedAgentId = undefined;
+    }
   }
 
   /** Smoothly focus the camera on a specific agent. */
