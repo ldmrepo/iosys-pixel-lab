@@ -23,6 +23,7 @@ import { SpriteSheet } from './SpriteSheet';
 import { Camera } from './Camera';
 import type { PathNode } from './PathFinder';
 import { CharacterBehavior, type BehaviorConfig } from './CharacterBehavior';
+import { MatrixEffect, type EffectType } from './MatrixEffect';
 
 /** Default animation definitions matching the sprite sheet layout spec. */
 const DEFAULT_ANIMATIONS: Record<AgentStatus, SpriteAnimation> = {
@@ -83,6 +84,12 @@ export class Character {
   /** Behavior FSM (optional — requires setBehavior call). */
   private behavior: CharacterBehavior | null = null;
 
+  /** Matrix spawn/despawn effect (null when no effect is playing). */
+  private matrixEffect: MatrixEffect | null = null;
+
+  /** Track whether this character is in the process of despawning. */
+  private isDespawning: boolean = false;
+
   constructor(
     state: AgentState,
     spriteSheet: SpriteSheet,
@@ -109,6 +116,22 @@ export class Character {
   /** Get the behavior FSM (if set). */
   getBehavior(): CharacterBehavior | null {
     return this.behavior;
+  }
+
+  /** Start a Matrix spawn or despawn effect. */
+  startMatrixEffect(type: EffectType): void {
+    this.matrixEffect = new MatrixEffect(type, this.spriteSheet.frameWidth);
+  }
+
+  /** Mark this character for despawn with Matrix effect. */
+  startDespawn(): void {
+    this.isDespawning = true;
+    this.startMatrixEffect('despawn');
+  }
+
+  /** Whether the character has a completed despawn effect (ready for removal). */
+  get isDespawnComplete(): boolean {
+    return this.isDespawning && this.matrixEffect !== null && this.matrixEffect.isComplete;
   }
 
   /** Update agent state from server. */
@@ -159,6 +182,11 @@ export class Character {
    */
   update(dt: number): void {
     this.globalTime += dt;
+
+    // Update Matrix effect
+    if (this.matrixEffect) {
+      this.matrixEffect.update(dt);
+    }
 
     // Update behavior FSM
     if (this.behavior) {
@@ -314,12 +342,52 @@ export class Character {
     const drawX = screen.x - fw / 2;
     const drawY = screen.y - fh + (this.tileSize * scale) / 2;
 
-    if (this.spriteSheet.isLoaded) {
-      this.spriteSheet.drawFrame(ctx, frameIndex, drawX, drawY, scale);
+    if (this.matrixEffect && !this.matrixEffect.isComplete) {
+      // Column-stagger rendering: draw sprite in vertical strips with per-column alpha
+      const numColumns = this.matrixEffect.columns;
+      const colWidth = fw / numColumns;
+
+      for (let col = 0; col < numColumns; col++) {
+        const colAlpha = this.matrixEffect.getColumnAlpha(col);
+        if (colAlpha <= 0) continue;
+
+        const prevAlpha = ctx.globalAlpha;
+        ctx.globalAlpha = prevAlpha * colAlpha;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(
+          Math.floor(drawX + col * colWidth),
+          Math.floor(drawY),
+          Math.ceil(colWidth),
+          Math.ceil(fh)
+        );
+        ctx.clip();
+
+        if (this.spriteSheet.isLoaded) {
+          this.spriteSheet.drawFrame(ctx, frameIndex, drawX, drawY, scale);
+        } else {
+          this.renderFallback(ctx, screen.x, screen.y, scale);
+        }
+
+        ctx.restore();
+        ctx.globalAlpha = prevAlpha;
+      }
+    } else if (this.isDespawning && this.matrixEffect?.isComplete) {
+      // Despawn complete — skip rendering entirely (engine will remove this character)
+      return;
     } else {
-      // Fallback: draw a colored rectangle
-      this.renderFallback(ctx, screen.x, screen.y, scale);
+      // Normal rendering
+      if (this.spriteSheet.isLoaded) {
+        this.spriteSheet.drawFrame(ctx, frameIndex, drawX, drawY, scale);
+      } else {
+        // Fallback: draw a colored rectangle
+        this.renderFallback(ctx, screen.x, screen.y, scale);
+      }
     }
+
+    // Skip name label and bubble while despawning
+    if (this.isDespawning) return;
 
     // Name label above character
     this.renderNameLabel(ctx, screen.x, drawY, scale);

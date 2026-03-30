@@ -14,12 +14,14 @@
 
 import type {
   AgentState,
+  AgentStatus,
   AssetManifest,
   OfficeLayout,
   TileInfo,
   CharacterSprite,
   Seat,
   FurnitureObject,
+  SpriteAnimation,
 } from '../shared/types';
 import { GameLoop } from './GameLoop';
 import { SpriteSheet } from './SpriteSheet';
@@ -38,6 +40,7 @@ export { PathFinder } from './PathFinder';
 export { Camera } from './Camera';
 export { CharacterBehavior } from './CharacterBehavior';
 export { ObjectRenderer } from './ObjectRenderer';
+export { MatrixEffect } from './MatrixEffect';
 
 // ─── Fallback defaults when shared modules are not yet available ───
 
@@ -236,6 +239,12 @@ export class PixelOfficeEngine {
       return;
     }
 
+    // Sub-agent handling: parentId identifies agents spawned by Task/Agent tool
+    if (state.parentId) {
+      this.addSubAgent(state);
+      return;
+    }
+
     // Get or create sprite sheet for this character
     const spriteSheet = this.getCharacterSpriteSheet(state.id);
     const charSprite = this.manifest.characters[state.id] ?? this.manifest.characters['default'];
@@ -284,6 +293,17 @@ export class PixelOfficeEngine {
 
   /** Remove an agent from the scene. */
   removeAgent(id: string): void {
+    const character = this.characters.get(id);
+    if (!character) return;
+
+    // Sub-agents despawn with Matrix effect instead of immediate removal
+    if (character.state.parentId) {
+      character.startDespawn();
+      // The update loop will remove the character after the effect completes
+      return;
+    }
+
+    // Normal agent removal (immediate)
     this.characters.delete(id);
     // Release seat assignment so future agents can use it
     const seat = this.layout.seats.find(s => s.assignedAgentId === id);
@@ -549,6 +569,125 @@ export class PixelOfficeEngine {
     }
   }
 
+  /**
+   * Add a sub-agent: spawns near parent, inherits parent's sprite sheet, wanders near parent.
+   */
+  private addSubAgent(state: AgentState): void {
+    const parentCharacter = this.characters.get(state.parentId!);
+
+    // Use parent's sprite sheet for palette inheritance (SUB-03)
+    let spriteSheet: SpriteSheet;
+    let animations: Record<AgentStatus, SpriteAnimation> | undefined;
+    if (parentCharacter) {
+      const parentId = state.parentId!;
+      spriteSheet = this.getCharacterSpriteSheet(parentId);
+      const charSprite = this.manifest.characters[parentId] ?? this.manifest.characters['default'];
+      animations = charSprite?.animations;
+    } else {
+      spriteSheet = this.getCharacterSpriteSheet(state.id);
+      animations = undefined;
+    }
+
+    // Find spawn position: nearest walkable tile to parent (SUB-02)
+    const parentTile = parentCharacter
+      ? parentCharacter.getTilePosition()
+      : { x: state.position.x, y: state.position.y };
+    const spawnPos = this.findNearestWalkable(parentTile.x, parentTile.y);
+
+    // Override state position with computed spawn position
+    const subState: AgentState = {
+      ...state,
+      position: spawnPos,
+    };
+
+    const character = new Character(
+      subState,
+      spriteSheet,
+      this.layout.tileSize,
+      animations
+    );
+
+    // Start Matrix spawn effect (SUB-04)
+    character.startMatrixEffect('spawn');
+
+    // Setup behavior: wander near parent seat area (limited radius)
+    const workSeat = parentTile; // Sub-agent's "home" is parent's position
+    const parentSeatTiles = this.getParentNearbyTiles(parentTile, 5); // 5-tile radius
+
+    character.setBehavior({
+      workSeat,
+      breakTiles: parentSeatTiles,
+      walkableTiles: parentSeatTiles,
+      requestPath: (targetX: number, targetY: number) => {
+        const currentTile = character.getTilePosition();
+        const path = this.pathFinder.findPath(currentTile.x, currentTile.y, targetX, targetY);
+        if (path.length > 1) {
+          character.setPath(path);
+        } else {
+          const behavior = character.getBehavior();
+          if (behavior) behavior.onArrived();
+        }
+      },
+    });
+
+    this.characters.set(state.id, character);
+  }
+
+  /**
+   * Find the nearest walkable tile to (cx, cy) using BFS expansion.
+   * Uses this.tileMap.isWalkable() which respects the furniture-aware walk grid.
+   * Returns the first walkable tile found, or the input position if none found.
+   */
+  private findNearestWalkable(cx: number, cy: number): { x: number; y: number } {
+    const { width, height } = this.layout;
+
+    // Check if starting position itself is walkable (furniture-aware via tileMap)
+    if (cx >= 0 && cx < width && cy >= 0 && cy < height) {
+      if (this.tileMap.isWalkable(cx, cy)) return { x: cx, y: cy };
+    }
+
+    // BFS outward to find nearest walkable
+    const visited = new Set<string>();
+    const queue: { x: number; y: number }[] = [{ x: cx, y: cy }];
+    visited.add(`${cx},${cy}`);
+    const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+
+    while (queue.length > 0) {
+      const cur = queue.shift()!;
+      for (const [dx, dy] of dirs) {
+        const nx = cur.x + dx;
+        const ny = cur.y + dy;
+        const key = `${nx},${ny}`;
+        if (visited.has(key)) continue;
+        visited.add(key);
+        if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+
+        // TileMap.isWalkable checks the walkGrid (furniture masks applied)
+        if (this.tileMap.isWalkable(nx, ny)) {
+          return { x: nx, y: ny };
+        }
+        queue.push({ x: nx, y: ny });
+      }
+      if (visited.size > 200) break; // Safety limit
+    }
+
+    return { x: cx, y: cy }; // Fallback
+  }
+
+  /**
+   * Get walkable tiles within Manhattan distance `radius` of a center tile.
+   */
+  private getParentNearbyTiles(center: { x: number; y: number }, radius: number): { x: number; y: number }[] {
+    const nearby: { x: number; y: number }[] = [];
+    for (const tile of this.walkableTiles) {
+      const dist = Math.abs(tile.x - center.x) + Math.abs(tile.y - center.y);
+      if (dist <= radius) {
+        nearby.push(tile);
+      }
+    }
+    return nearby.length > 0 ? nearby : [center]; // fallback to center if nothing found
+  }
+
   private getCharacterSpriteSheet(agentId: string): SpriteSheet {
     // Check if there's a specific sheet for this agent
     if (this.characterSpriteSheets.has(agentId)) {
@@ -583,9 +722,16 @@ export class PixelOfficeEngine {
     // Update camera (smooth focus)
     this.camera.update(dt);
 
-    // Update all characters
-    for (const character of this.characters.values()) {
+    // Update all characters and clean up completed despawns
+    const toRemove: string[] = [];
+    for (const [id, character] of this.characters) {
       character.update(dt);
+      if (character.isDespawnComplete) {
+        toRemove.push(id);
+      }
+    }
+    for (const id of toRemove) {
+      this.characters.delete(id);
     }
   }
 
