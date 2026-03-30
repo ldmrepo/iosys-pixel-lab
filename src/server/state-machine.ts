@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import type { AgentState, AgentStatus, AgentEvent, Seat } from '../shared/types.js';
 import { SessionDiscovery, type DiscoveredSession } from './session-discovery.js';
+import { computeCost } from './pricing.js';
 
 // Timeout thresholds (ms)
 const WAITING_TIMEOUT = 30_000;  // 30s after last assistant message -> waiting
@@ -20,6 +21,7 @@ interface AgentTimers {
   hadToolsInTurn: boolean;
   backgroundAgentIds: Set<string>;    // tool IDs of active background agents
   activeSubAgents: Map<string, string>; // toolCallId -> subAgentId
+  seenMessageIds: Set<string>;          // dedup message.id within session to avoid double-counting
 }
 
 // Default fallback seats when office-layout is not available
@@ -137,6 +139,34 @@ export class AgentStateMachine extends EventEmitter {
 
     // DETECT-01: turn_end (definitive turn end)
     if (event.type === 'turn_end') {
+      // Accumulate token usage if present, with message.id deduplication
+      if (event.usage) {
+        const msgId = event.usage.message_id;
+        // Skip if we've already counted this message (parallel tool calls can repeat the same id)
+        if (!msgId || !timers.seenMessageIds.has(msgId)) {
+          if (msgId) timers.seenMessageIds.add(msgId);
+
+          // Initialize tokenUsage on first occurrence
+          if (!agent.tokenUsage) {
+            agent.tokenUsage = {
+              inputTokens: 0,
+              outputTokens: 0,
+              cacheReadTokens: 0,
+              cacheCreationTokens: 0,
+              costUSD: 0,
+            };
+          }
+
+          agent.tokenUsage.inputTokens += event.usage.input_tokens;
+          agent.tokenUsage.outputTokens += event.usage.output_tokens;
+          agent.tokenUsage.cacheReadTokens += (event.usage.cache_read_input_tokens ?? 0);
+          agent.tokenUsage.cacheCreationTokens += (event.usage.cache_creation_input_tokens ?? 0);
+
+          // Compute incremental cost for this turn and add to running total
+          agent.tokenUsage.costUSD += computeCost(event.usage, event.usage.model);
+        }
+      }
+
       agent.status = 'waiting';
       agent.lastAction = event.content;
       agent.lastUpdated = event.timestamp;
@@ -325,6 +355,7 @@ export class AgentStateMachine extends EventEmitter {
         hadToolsInTurn: false,
         backgroundAgentIds: new Set(),
         activeSubAgents: new Map(),
+        seenMessageIds: new Set(),
       };
       this.agentTimers.set(agentId, timers);
     }

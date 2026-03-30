@@ -21,6 +21,7 @@ interface RawJSONLEntry {
   message?: {
     role?: string;
     content?: string | ContentBlock[];
+    id?: string;  // message.id for deduplication (present in turn_duration entries)
   };
   sessionId?: string;
   timestamp?: string;
@@ -31,6 +32,15 @@ interface RawJSONLEntry {
   tool_use_id?: string;         // present in tool_result entries for lifecycle tracking
   // assistant specific -- tool_use at top level in some formats
   input?: Record<string, unknown>;
+  // turn_duration specific
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    cache_read_input_tokens?: number;
+    cache_creation_input_tokens?: number;
+  };
+  model?: string;
+  durationMs?: number;
 }
 
 /**
@@ -64,12 +74,30 @@ export function parseJSONLLine(line: string, fallbackSessionId: string): AgentEv
   if (entryType === 'system') {
     // Parse turn_duration subtype — definitive turn end signal
     if (raw.subtype === 'turn_duration') {
+      console.log('[Parser] turn_duration raw keys:', JSON.stringify(Object.keys(raw)));
+      console.log('[Parser] turn_duration usage path check:',
+        'raw.usage:', !!(raw as RawJSONLEntry).usage,
+        'raw.message:', !!(raw as RawJSONLEntry).message,
+      );
+
+      const usageData = raw.usage;
+      const messageObj = raw.message;
+      const model = raw.model;
+
       return {
         timestamp,
         sessionId,
         type: 'turn_end',
         content: 'turn_duration',
         raw,
+        usage: usageData ? {
+          input_tokens: usageData.input_tokens ?? 0,
+          output_tokens: usageData.output_tokens ?? 0,
+          cache_read_input_tokens: usageData.cache_read_input_tokens,
+          cache_creation_input_tokens: usageData.cache_creation_input_tokens,
+          model: model ?? undefined,
+          message_id: messageObj?.id ?? undefined,
+        } : undefined,
       };
     }
     return null;
