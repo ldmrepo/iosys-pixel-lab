@@ -73,11 +73,11 @@ const FALLBACK_SEATS: Seat[] = [
   { id: 'seat-4', tileX: 3, tileY: 8,  deskTileX: 3, deskTileY: 7,  facing: 'up' },
 ];
 
-const FALLBACK_TILES = generateFallbackTiles(20, 15);
+const FALLBACK_TILES = generateFallbackTiles(30, 24);
 
 const FALLBACK_LAYOUT: OfficeLayout = {
-  width: 20,
-  height: 15,
+  width: 30,
+  height: 24,
   tileSize: 16,
   tiles: FALLBACK_TILES,
   furniture: [],

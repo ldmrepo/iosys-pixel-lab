@@ -280,74 +280,72 @@ const seats: Seat[] = [];
 let seatId = 1;
 
 /**
- * Island Pod: 2 columns of 2 desks each;
- * top desks face south (chairs below), bottom desks face north (chairs above).
- * Pod footprint: 6 tiles wide x 5 tiles tall (sy to sy+4)
+ * Island Pod: single column of 2 desks;
+ * top desk faces south (chairs below), bottom desk faces north (chairs above).
+ * Pod footprint: 2 tiles wide x 5 tiles tall (sy to sy+4).
  * Produces 4 seats per pod.
  */
 function createPod(sx: number, sy: number, prefix: string) {
-  for (let i = 0; i < 2; i++) {
-    const dx = sx + i * 3;
+  const dx = sx;
 
-    // Top desk (facing south)
+  // Top desk (facing south)
+  furniture.push({
+    id: `desk-${prefix}-top-0`, type: 'desk',
+    tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
+    walkableMask: [false, false],
+    sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
+  });
+  furniture.push({
+    id: `mon-${prefix}-top-0`, type: 'monitor',
+    tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
+    walkableMask: [false, false],
+    sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
+  });
+  for (let c = 0; c < 2; c++) {
+    const id = `s${seatId++}`;
     furniture.push({
-      id: `desk-${prefix}-top-${i}`, type: 'desk',
-      tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
-      walkableMask: [false, false],
-      sprite: SPRITES.DESK_TOP, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
+      id: `chair-${id}`, type: 'chair',
+      tileX: dx + c, tileY: sy + 1, widthTiles: 1, heightTiles: 1,
+      walkableMask: [true],
+      sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
     });
-    furniture.push({
-      id: `mon-${prefix}-top-${i}`, type: 'monitor',
-      tileX: dx, tileY: sy, widthTiles: 2, heightTiles: 1,
-      walkableMask: [false, false],
-      sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
-    });
-    for (let c = 0; c < 2; c++) {
-      const id = `s${seatId++}`;
-      furniture.push({
-        id: `chair-${id}`, type: 'chair',
-        tileX: dx + c, tileY: sy + 1, widthTiles: 1, heightTiles: 1,
-        walkableMask: [true],
-        sprite: SPRITES.CHAIR_DOWN, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
-      });
-      seats.push({ id, tileX: dx + c, tileY: sy + 1, deskTileX: dx, deskTileY: sy, facing: 'down' });
-    }
+    seats.push({ id, tileX: dx + c, tileY: sy + 1, deskTileX: dx, deskTileY: sy, facing: 'down' });
+  }
 
-    // Bottom desk (facing north)
-    const bdy = sy + 3;
+  // Bottom desk (facing north)
+  const bdy = sy + 3;
+  furniture.push({
+    id: `desk-${prefix}-bot-0`, type: 'desk',
+    tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
+    walkableMask: [false, false],
+    sprite: SPRITES.DESK_BOT, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
+  });
+  furniture.push({
+    id: `mon-${prefix}-bot-0`, type: 'monitor',
+    tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
+    walkableMask: [false, false],
+    sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
+  });
+  for (let c = 0; c < 2; c++) {
+    const id = `s${seatId++}`;
     furniture.push({
-      id: `desk-${prefix}-bot-${i}`, type: 'desk',
-      tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
-      walkableMask: [false, false],
-      sprite: SPRITES.DESK_BOT, renderWidth: 32, renderHeight: 32, drawOffsetY: 16,
+      id: `chair-${id}`, type: 'chair',
+      tileX: dx + c, tileY: bdy - 1, widthTiles: 1, heightTiles: 1,
+      walkableMask: [true],
+      sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
     });
-    furniture.push({
-      id: `mon-${prefix}-bot-${i}`, type: 'monitor',
-      tileX: dx, tileY: bdy, widthTiles: 2, heightTiles: 1,
-      walkableMask: [false, false],
-      sprite: SPRITES.MONITOR, renderWidth: 32, renderHeight: 16, drawOffsetY: 0, sortY: -1,
-    });
-    for (let c = 0; c < 2; c++) {
-      const id = `s${seatId++}`;
-      furniture.push({
-        id: `chair-${id}`, type: 'chair',
-        tileX: dx + c, tileY: bdy - 1, widthTiles: 1, heightTiles: 1,
-        walkableMask: [true],
-        sprite: SPRITES.CHAIR_UP, renderWidth: 16, renderHeight: 24, seatId: id, drawOffsetY: 8,
-      });
-      seats.push({ id, tileX: dx + c, tileY: bdy - 1, deskTileX: dx, deskTileY: bdy, facing: 'up' });
-    }
+    seats.push({ id, tileX: dx + c, tileY: bdy - 1, deskTileX: dx, deskTileY: bdy, facing: 'up' });
   }
 }
 
 // ── Work Zone A: 3 pods, 12 seats (ZONES.workA: x=9..28, y=1..9) ──
-createPod(10, 2, 'A1');   // pod at x:10-15, y:2-6, seats s1-s4
-createPod(17, 2, 'A2');   // pod at x:17-22, y:2-6, seats s5-s8
-createPod(23, 2, 'A3');   // pod at x:23-28, y:2-6, seats s9-s12
+createPod(10, 2, 'A1');   // pod at x:10-11, y:2-6, seats s1-s4
+createPod(15, 2, 'A2');   // pod at x:15-16, y:2-6, seats s5-s8
+createPod(20, 2, 'A3');   // pod at x:20-21, y:2-6, seats s9-s12
 
 // ── Work Zone B: 2 pods, 8 seats (ZONES.workB: x=1..14, y=11..15) ──
-createPod(2, 11, 'B1');   // pod at x:2-7, y:11-15, seats s13-s16
-createPod(9, 11, 'B2');   // pod at x:9-14, y:11-15, seats s17-s20
+createPod(3, 11, 'B1');   // pod at x:3-4, y:11-15, seats s13-s16
+createPod(9, 11, 'B2');   // pod at x:9-10, y:11-15, seats s17-s20
 
 // Total seat count: 12 (Zone A) + 8 (Zone B) = 20 seats
 
