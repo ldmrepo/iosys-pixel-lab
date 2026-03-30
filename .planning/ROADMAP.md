@@ -91,11 +91,11 @@ Plans:
   3. 새 JSONL 데이터 수신 시 진행 중인 permission/waiting 타이머가 즉시 취소된다
   4. run_in_background 도구 호출이 queue-operation 이벤트로 파싱되어 별도 추적된다
   5. 텍스트 전용 턴에서 5초 미활동 시 waiting 상태로 전환된다
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 08-01: turn_duration 파서 + 텍스트 턴 waiting 타이머
-- [ ] 08-02: permission 타이머 + 타이머 취소 로직 + background agent 추적
+- [ ] 08-01-PLAN.md — 타입 확장 + turn_duration 파서 + per-agent 타이머 인프라 + text-idle 5s
+- [ ] 08-02-PLAN.md — Background agent 추적 + 타이머 취소 검증 + E2E 통합 확인
 
 ### Phase 9: Visual Feedback
 **Goal**: 캐릭터 위에 상태별 말풍선이 표시되고 턴 종료 시 사운드 알림이 재생된다
@@ -144,6 +144,6 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 6. Movement Engine | 2/2 | Complete   | 2026-03-30 | - |
 | 7. Character Behavior | v1.1 | 1/1 | Complete | 2026-03-30 |
-| 8. State Detection | v1.1 | 0/2 | Not started | - |
+| 8. State Detection | v1.1 | 0/2 | Planning complete | - |
 | 9. Visual Feedback | v1.1 | 0/2 | Not started | - |
 | 10. Sub-Agents | v1.1 | 0/2 | Not started | - |
