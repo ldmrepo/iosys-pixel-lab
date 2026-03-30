@@ -71,6 +71,9 @@ export class Character {
   /** Global time accumulator for bubble animation. */
   private globalTime: number = 0;
 
+  /** Current facing direction, updated during path movement. */
+  private currentDirection: 'down' | 'up' | 'left' | 'right' = 'down';
+
   /** Behavior FSM (optional — requires setBehavior call). */
   private behavior: CharacterBehavior | null = null;
 
@@ -167,15 +170,32 @@ export class Character {
   }
 
   /**
-   * Determine the effective animation status considering behavior.
-   * When walking, show idle animation (walking sprite).
+   * Determine the effective animation status considering behavior and direction.
+   * When walking, return direction-specific walk_* animation.
    * When at work desk but inactive, show idle.
    */
   private getEffectiveStatus(): AgentStatus {
-    if (!this.behavior) return this.state.status;
+    if (!this.behavior) {
+      // Non-behavior characters: use walk animation when moving along path
+      if (this.isMoving) {
+        switch (this.currentDirection) {
+          case 'up':    return 'walk_up';
+          case 'down':  return 'walk_down';
+          case 'left':  return 'walk_left';
+          case 'right': return 'walk_right';
+        }
+      }
+      return this.state.status;
+    }
 
     if (this.behavior.isWalking) {
-      return 'idle'; // Walking uses idle animation frames
+      // Return direction-specific walk animation
+      switch (this.currentDirection) {
+        case 'up':    return 'walk_up';
+        case 'down':  return 'walk_down';
+        case 'left':  return 'walk_left';
+        case 'right': return 'walk_right';
+      }
     }
     if (this.behavior.shouldPlayWorkAnim) {
       return this.state.status; // Play the actual status animation
@@ -228,6 +248,14 @@ export class Character {
 
     const dx = targetX - this.worldX;
     const dy = targetY - this.worldY;
+
+    // Update facing direction based on movement delta
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.currentDirection = dx > 0 ? 'right' : 'left';
+    } else if (dy !== 0) {
+      this.currentDirection = dy > 0 ? 'down' : 'up';
+    }
+
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     const step = MOVE_SPEED * this.tileSize * dt;
