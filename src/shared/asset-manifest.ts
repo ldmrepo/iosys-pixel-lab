@@ -74,5 +74,6 @@ export const assetManifest: AssetManifest = {
     bathroom:       { url: '/assets/metrocity/Interior/Home/Bathroom-Sheet.png',          name: 'Bathroom' },
     beds:           { url: '/assets/metrocity/Interior/Home/Beds-Sheet.png',              name: 'Beds' },
     bedHospital:    { url: '/assets/metrocity/Interior/Hospital/BedHospital-Sheet.png',   name: 'Hospital Beds' },
+    meetingTable:   { url: '/assets/sprites/meeting-table.png',                          name: 'Meeting Table' },
   },
 };
