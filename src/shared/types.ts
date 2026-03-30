@@ -1,6 +1,14 @@
 export type AgentStatus = 'idle' | 'typing' | 'reading' | 'executing' | 'waiting' | 'done' | 'error'
   | 'walk_down' | 'walk_up' | 'walk_right' | 'walk_left';
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheCreationTokens: number;
+  costUSD: number;
+}
+
 export interface AgentEvent {
   timestamp: number;
   sessionId: string;
@@ -9,6 +17,14 @@ export interface AgentEvent {
   raw: unknown;
   toolName?: string;             // extracted tool name for tool_use events
   toolCallId?: string;           // tool_use block id for sub-agent tracking (Task/Agent only)
+  usage?: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_read_input_tokens?: number;
+    cache_creation_input_tokens?: number;
+    model?: string;
+    message_id?: string;
+  };
 }
 
 export interface AgentState {
@@ -22,6 +38,7 @@ export interface AgentState {
   position: { x: number; y: number };
   permissionPending: boolean;   // true when waiting for tool permission (7s timeout)
   parentId?: string;            // set for sub-agents — references the parent agent's id
+  tokenUsage?: TokenUsage;      // accumulated token usage and cost for this agent's session
 }
 
 export interface WSMessage {
