@@ -23,10 +23,24 @@ export interface WSMessage {
   payload: AgentState | AgentState[];
 }
 
+/** 6-zone floor classification for the expanded 30x24 office */
+export type FloorZone = 'corridor' | 'work' | 'lounge' | 'server' | 'meeting' | 'lobby';
+
+/** Maps zone name to numeric spriteIndex used by TileMap.getZoneColor() */
+export const ZONE_INDEX: Record<FloorZone, number> = {
+  corridor: 0,
+  work:     1,
+  lounge:   2,
+  server:   3,
+  meeting:  4,
+  lobby:    5,
+};
+
 export interface TileInfo {
   type: 'floor' | 'wall';
   walkable: boolean;
   spriteIndex: number;
+  zone?: FloorZone;
 }
 
 // ─── Furniture Object Layer ───
@@ -46,7 +60,8 @@ export interface ObjectSpriteRef {
 export type FurnitureType =
   | 'desk' | 'chair' | 'sofa' | 'bookshelf' | 'cabinet'
   | 'plant' | 'monitor' | 'lamp' | 'carpet' | 'painting'
-  | 'appliance' | 'whiteboard' | 'water-cooler' | 'window' | 'decoration';
+  | 'appliance' | 'whiteboard' | 'water-cooler' | 'window' | 'door' | 'decoration'
+  | 'server-rack' | 'fireplace' | 'reception-desk';
 
 export interface FurnitureObject {
   id: string;
