@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: planning
-stopped_at: Phase 8 planned — 2 plans in 2 waves ready for execution
-last_updated: "2026-03-30T14:48:27.062Z"
+status: executing
+stopped_at: Completed 08-01-PLAN.md — turn_duration parser + text-idle timer
+last_updated: "2026-03-30T14:56:34.675Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 40
 ---
 
@@ -18,7 +18,7 @@ progress:
 ## Current Phase
 
 **Phase 8 of 10** (v1.1) — State Detection
-**Status:** Ready to plan
+**Status:** Executing Phase 08
 
 ## Phase Status
 
@@ -44,6 +44,9 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 06-movement-engine]: setPath() resets animTime=0 and currentFrameIndex=0 so walk animation starts at frame 0 cleanly
 - [Phase 07-character-behavior]: Extracted 8 named timing constants (WANDER_PAUSE/MOVES/SEAT_REST/SEAT_LEAVE MIN/MAX) to eliminate magic number duplication across 7 call sites
 - [Phase 07-character-behavior]: seatLeaveDelay kept at 2-5s per prior user decision; only renamed to use named constants
+- [Phase 08-state-detection]: AgentTimers interface with per-agent setTimeout replaces polling for waiting transitions
+- [Phase 08-state-detection]: cancelAllTimers on every processEvent invocation — any JSONL data resets all pending timers
+- [Phase 08-state-detection]: turn_end bypasses deriveStatus — immediately sets waiting
 
 ## Accumulated Context (from v1.0)
 
@@ -60,5 +63,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Phase 8 planned — 2 plans in 2 waves ready for execution
+Stopped at: Completed 08-01-PLAN.md — turn_duration parser + text-idle timer
 Resume: `/gsd:plan-phase 8`

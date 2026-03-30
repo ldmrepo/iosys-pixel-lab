@@ -144,6 +144,6 @@ Phases execute in this order: 6 → 7 → 8 → 9 → 10
 | 5. Integration & Verification | v1.0 | 1/1 | Complete | 2026-03-30 |
 | 6. Movement Engine | 2/2 | Complete   | 2026-03-30 | - |
 | 7. Character Behavior | v1.1 | 1/1 | Complete | 2026-03-30 |
-| 8. State Detection | v1.1 | 0/2 | Planning complete | - |
+| 8. State Detection | 1/2 | In Progress|  | - |
 | 9. Visual Feedback | v1.1 | 0/2 | Not started | - |
 | 10. Sub-Agents | v1.1 | 0/2 | Not started | - |
