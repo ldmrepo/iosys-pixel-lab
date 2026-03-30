@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
-status: roadmap_ready
-stopped_at: Roadmap created — awaiting phase planning
-last_updated: "2026-03-30T22:00:00.000Z"
+status: unknown
+stopped_at: Phase 11 context gathered
+last_updated: "2026-03-30T22:19:56.769Z"
 progress:
   total_phases: 3
   completed_phases: 0
@@ -46,8 +46,10 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 
 - Canvas context reset: canvas.width/height 속성 직접 수정 시 imageSmoothingEnabled 초기화됨
   → 매 drawFrame() 호출 상단에 imageSmoothingEnabled = false 재적용, canvas wrapper에 flex: 1; min-width: 0 사용
+
 - Token 이중 카운팅: 병렬 도구 호출 시 동일 message.id가 여러 엔트리에 등장
   → per-session Set<string>으로 message.id 중복제거, turn_end마다 리셋
+
 - 에셋 frame dimension 불일치: 비균일 시트에 잘못된 frameWidth 전달 시 오류 렌더
   → 모든 신규 에셋은 ObjectSpriteRef(sx/sy/sw/sh) region 방식 사용, 인라인 매직넘버 금지
 
@@ -65,6 +67,7 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 
 - Phase 12 착수 전: JSONL system/turn_duration 엔트리의 usage 정확한 JSON 경로 확인 필요
   (raw.usage vs raw.message.usage — parser.ts에 console.log 한 줄로 확인)
+
 - Phase 13 착수 전: Pixel Life / office_assets_release 스프라이트 좌표 측정 필요
   (PixelOffice 16px 그리드는 확인됨, 나머지 2팩은 이미지 에디터 실측 필요)
 
@@ -74,4 +77,4 @@ v1.2: [░░░░░░░░░░░░░░░░░░░░] 0/3 phases
 
 ## Last Session
 
-Stopped at: Roadmap created for v1.2 — 14 requirements mapped across 3 phases (11-13)
+Stopped at: Phase 11 context gathered
