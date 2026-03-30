@@ -46,10 +46,10 @@ Plans:
 
 **Goal**: 30x24 그리드에 6개 존과 전체 가구를 체계적으로 배치
 **Requirements**: R1, R3, R4, R6
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 02-01-PLAN.md — 30x24 그리드 + 6존 배치 + 전체 가구/좌석 배치 + 벽면 장식
+- [x] 02-01-PLAN.md — 30x24 그리드 + 6존 배치 + 전체 가구/좌석 배치 + 벽면 장식
 
 **Files**:
 - `src/shared/office-layout.ts` — 전면 재작성
