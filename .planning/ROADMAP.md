@@ -4,17 +4,22 @@
 
 | Phase | Name | Requirements | Key Deliverable |
 |-------|------|-------------|-----------------|
-| P1 | Type & Manifest Expansion | R1.2, R2 | 타입 확장 + 전체 에셋 등록 |
-| P2 | Office Layout Design | R1, R3, R4, R6 | 30×24 그리드 + 6존 + 전체 가구 배치 |
-| P3 | TileMap Engine Adaptation | R5.1, R5.2, R5.5 | 존 컬러 시스템 + walkableMask |
-| P4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
-| P5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
+| 1 | Type & Manifest Expansion | R1.2, R2 | 타입 확장 + 전체 에셋 등록 |
+| 2 | Office Layout Design | R1, R3, R4, R6 | 30×24 그리드 + 6존 + 전체 가구 배치 |
+| 3 | TileMap Engine Adaptation | R5.1, R5.2, R5.5 | 존 컬러 시스템 + walkableMask |
+| 4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
+| 5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
 
 ---
 
-## P1: Type & Manifest Expansion
+## Phase 1: Type & Manifest Expansion
 
 **Goal**: 확장 오피스에 필요한 타입과 에셋 매니페스트를 준비
+**Requirements**: R1.2, R2
+**Plans:** 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md — FloorZone 타입 확장 + 8개 시트 등록 + SPRITES region 확장
 
 **Files**:
 - `src/shared/types.ts` — 존 타입, 맵 크기 유연화
@@ -37,9 +42,10 @@
 
 ---
 
-## P2: Office Layout Design
+## Phase 2: Office Layout Design
 
 **Goal**: 30×24 그리드에 6개 존과 전체 가구를 체계적으로 배치
+**Requirements**: R1, R3, R4, R6
 
 **Files**:
 - `src/shared/office-layout.ts` — 전면 재작성
@@ -60,9 +66,10 @@
 
 ---
 
-## P3: TileMap Engine Adaptation
+## Phase 3: TileMap Engine Adaptation
 
 **Goal**: 엔진이 확장 맵과 다중 존을 렌더링할 수 있도록 개선
+**Requirements**: R5.1, R5.2, R5.5
 
 **Files**:
 - `src/engine/TileMap.ts` — 존 컬러 시스템 리팩터
@@ -79,9 +86,10 @@
 
 ---
 
-## P4: ObjectRenderer & Sprites
+## Phase 4: ObjectRenderer & Sprites
 
 **Goal**: 신규 가구 타입이 정상 렌더링되도록 ObjectRenderer 확장
+**Requirements**: R5.3
 
 **Files**:
 - `src/engine/ObjectRenderer.ts` — 신규 시트 로딩, region 렌더링
@@ -99,9 +107,10 @@
 
 ---
 
-## P5: Integration & Verification
+## Phase 5: Integration & Verification
 
 **Goal**: 확장 오피스에서 전체 시스템이 정상 동작하는지 검증
+**Requirements**: R5.4
 
 **Files**:
 - `src/engine/index.ts` — 좌석 배정 로직
@@ -123,13 +132,13 @@
 ## Dependency Graph
 
 ```
-P1 (types/manifest)
+Phase 1 (types/manifest)
  ↓
-P2 (layout) ───→ P3 (tilemap engine)
-                   ↓
-                 P4 (object renderer)
-                   ↓
-                 P5 (integration)
+Phase 2 (layout) ───→ Phase 3 (tilemap engine)
+                        ↓
+                      Phase 4 (object renderer)
+                        ↓
+                      Phase 5 (integration)
 ```
 
-P1 → P2는 순차, P3/P4는 P2 완료 후 진행, P5는 모든 phase 완료 후.
+Phase 1 → Phase 2는 순차, Phase 3/4는 Phase 2 완료 후 진행, Phase 5는 모든 phase 완료 후.
