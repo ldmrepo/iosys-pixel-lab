@@ -126,7 +126,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 05-01-PLAN.md — Fix seat count bug + async race condition + FALLBACK_LAYOUT + visual verification
+- [x] 05-01-PLAN.md — Fix seat count bug + async race condition + FALLBACK_LAYOUT + visual verification (v1.0 APPROVED)
 
 **Files**:
 - `src/shared/office-layout.ts` — createPod 좌석 수 수정 (40 -> 20)

@@ -15,7 +15,7 @@ provides:
   - StateMachine.waitForLayout() for awaitable layout loading
   - FALLBACK_LAYOUT updated to 30x24 dimensions
   - Server startup awaits real seat data before session discovery
-  - v1.0 milestone visual verification (pending human checkpoint)
+  - v1.0 milestone E2E visual verification APPROVED — 6 zones, 20 seats, WebSocket agents, walkableMask clean
 
 affects: [state-machine, server-startup, seat-assignment, pathfinder]
 
@@ -45,20 +45,20 @@ patterns-established:
 
 requirements-completed: [R5.4]
 
-duration: 3min (Tasks 1-2; Task 3 pending human verification)
+duration: ~35min (Tasks 1-2 automated; Task 3 human checkpoint approved)
 completed: 2026-03-30
 ---
 
 # Phase 05 Plan 01: Integration & Verification Summary
 
-**Fixed 3 defects blocking v1.0: createPod now produces 20 seats (not 40), StateMachine awaits layout before session discovery, FALLBACK_LAYOUT updated to 30x24**
+**v1.0 milestone complete: 3 defects fixed (20-seat createPod, async race via layoutReady promise, FALLBACK_LAYOUT 30x24), E2E visual verification approved — 6 zones, 20 seats, WebSocket agents, walkableMask all clear**
 
 ## Performance
 
-- **Duration:** ~3 min (Tasks 1-2 automated; Task 3 awaiting human visual verification)
+- **Duration:** ~35 min (Tasks 1-2 automated; Task 3 human checkpoint approved)
 - **Started:** 2026-03-30T09:21:07Z
-- **Completed:** 2026-03-30T09:23:33Z (Tasks 1-2)
-- **Tasks:** 2/3 complete (Task 3 is checkpoint:human-verify)
+- **Completed:** 2026-03-30T10:05:00Z
+- **Tasks:** 3/3 complete
 - **Files modified:** 4
 
 ## Accomplishments
@@ -76,7 +76,7 @@ Each task was committed atomically:
 
 1. **Task 1: Fix seat count bug and update FALLBACK_LAYOUT** - `380ccac` (fix)
 2. **Task 2: Fix StateMachine async race condition** - `8377bf8` (fix)
-3. **Task 3: Visual integration verification** - PENDING (checkpoint:human-verify)
+3. **Task 3: Visual integration verification** - APPROVED (checkpoint:human-verify — v1.0 milestone gate passed)
 
 ## Files Created/Modified
 
@@ -103,14 +103,32 @@ None. All three fixes applied cleanly, TypeScript typecheck passes after each ta
 
 None - no external service configuration required.
 
+## v1.0 Milestone Verification Results
+
+Human reviewer confirmed all acceptance criteria (2026-03-30):
+
+- 30x24 map renders correctly with 6 distinct zone colors
+- 20 seats (5 pods x 4): agents properly seated at Work Zone A
+- Server racks (blue/purple/green neon) display correctly
+- WebSocket/StateMachine: 2 agents detected with status executing/reading
+- walkableMask assertion passed (server running without crash)
+- Camera auto-fit shows complete 30x24 map
+
+Low-priority aesthetic notes (not blockers, deferred):
+- Desk sprites render as white rectangles (Kitchen1 asset characteristic)
+- Meeting room carpet slightly large
+- North wall decorations dense spacing
+
 ## Next Phase Readiness
 
-- Tasks 1-2 complete with commits 380ccac and 8377bf8
-- Task 3 (visual verification) is the final v1.0 milestone gate — requires human to run `npm run dev`, open http://localhost:5173, and confirm:
-  - Server log: `[StateMachine] Loaded 20 seats from office-layout`
-  - Engine log: `[Engine] Cached N walkable tiles, M break tiles` (N > 200)
-  - 6 zone colors visible, furniture rendered, agents at desks if sessions active
-  - No runtime errors (walkableMask assertion passes at module load)
+**v1.0 milestone is complete.** All five phases are done:
+- P1: Type & Manifest Expansion
+- P2: Office Layout Design (30x24, 6 zones, 20 seats)
+- P3: TileMap Engine Adaptation
+- P4: ObjectRenderer & Sprites
+- P5: Integration & Verification (this plan)
+
+The system is production-ready as an AI agent visualization tool. The three deferred aesthetic items above are candidates for a future polish pass.
 
 ---
 *Phase: 05-integration-verification*
@@ -127,5 +145,9 @@ None - no external service configuration required.
 ### Commits exist:
 - 380ccac: fix(05-01): fix seat count bug and update FALLBACK_LAYOUT
 - 8377bf8: fix(05-01): fix StateMachine async race condition
+
+### Task 3 Gate:
+- APPROVED by human reviewer 2026-03-30
+- All v1.0 acceptance criteria verified
 
 ## Self-Check: PASSED
