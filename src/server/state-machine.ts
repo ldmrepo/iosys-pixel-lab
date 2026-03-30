@@ -18,6 +18,7 @@ interface AgentTimers {
   permissionTimer: ReturnType<typeof setTimeout> | null;
   textIdleTimer: ReturnType<typeof setTimeout> | null;
   hadToolsInTurn: boolean;
+  backgroundAgentIds: Set<string>;  // tool IDs of active background agents
 }
 
 // Default fallback seats when office-layout is not available
@@ -126,9 +127,16 @@ export class AgentStateMachine extends EventEmitter {
       return;
     }
 
-    // DETECT-04: queue-operation (background agent)
+    // DETECT-04: queue-operation (background agent completion)
     if (event.type === 'queue-operation') {
-      // Track but don't change agent status — handled by Plan 02
+      // A queue-operation event typically signals background agent activity.
+      // Check if this is a completion signal and remove from tracking.
+      const rawEntry = event.raw as Record<string, unknown>;
+      const toolId = rawEntry?.tool_use_id as string | undefined;
+      if (toolId && timers.backgroundAgentIds.has(toolId)) {
+        timers.backgroundAgentIds.delete(toolId);
+        console.log(`[StateMachine] Background agent completed: ${toolId} for ${agent.id}`);
+      }
       agent.lastUpdated = event.timestamp;
       this.emit('agent-update', { ...agent });
       return;
@@ -136,6 +144,19 @@ export class AgentStateMachine extends EventEmitter {
 
     // DETECT-04: background-tool (run_in_background)
     if (event.type === 'background-tool') {
+      // Extract tool call ID from raw for tracking
+      const rawEntry = event.raw as Record<string, unknown>;
+      const message = rawEntry?.message as Record<string, unknown> | undefined;
+      const content = message?.content;
+      if (Array.isArray(content)) {
+        for (const block of content) {
+          const b = block as Record<string, unknown>;
+          if (b?.type === 'tool_use' && b?.id) {
+            timers.backgroundAgentIds.add(b.id as string);
+            console.log(`[StateMachine] Background agent tracked: ${b.id} for ${agent.id}`);
+          }
+        }
+      }
       agent.lastUpdated = event.timestamp;
       agent.lastAction = event.content;
       this.emit('agent-update', { ...agent });
@@ -273,7 +294,12 @@ export class AgentStateMachine extends EventEmitter {
   private getTimers(agentId: string): AgentTimers {
     let timers = this.agentTimers.get(agentId);
     if (!timers) {
-      timers = { permissionTimer: null, textIdleTimer: null, hadToolsInTurn: false };
+      timers = {
+        permissionTimer: null,
+        textIdleTimer: null,
+        hadToolsInTurn: false,
+        backgroundAgentIds: new Set(),
+      };
       this.agentTimers.set(agentId, timers);
     }
     return timers;
