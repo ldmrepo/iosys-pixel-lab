@@ -2,35 +2,82 @@
 phase: 04-objectrenderer-sprites
 plan: 01
 subsystem: rendering
-tags: [sprite-rendering, office-layout, engine, canvas2d]
-dependency_graph:
-  requires: []
-  provides: [renderWidth-renderHeight-on-FurnitureObject, corrected-SPRITES-regions, furniture-renderWidth-renderHeight]
-  affects: [src/engine/ObjectRenderer.ts, src/shared/office-layout.ts, src/shared/types.ts]
-tech_stack:
+tags: [canvas2d, sprite-rendering, tilemap, typescript, office-layout]
+
+# Dependency graph
+requires:
+  - phase: 03-tilemap-engine-adaptation
+    provides: TileMap engine, ZONE_COLORS, walkableMask verification, camera confirmed
+  - phase: 02-office-layout-design
+    provides: 30x24 office grid, 6 zones, 72 furniture objects, SPRITES constant
+  - phase: 01-type-manifest-expansion
+    provides: FurnitureObject type, ObjectSpriteRef, asset-manifest with 8 sheets
+provides:
+  - ObjectRenderer uses renderWidth/renderHeight for display sizing (not raw sprite dims)
+  - FurnitureObject type extended with optional renderWidth/renderHeight fields
+  - All 17 SPRITES region coordinates corrected to verified PNG cell positions
+  - All 72 furniture objects have explicit renderWidth/renderHeight/drawOffsetY values
+  - drawOffsetY sign convention fixed: positive = shift up (engine formula honored)
+affects:
+  - 05-integration-verification
+
+# Tech tracking
+tech-stack:
   added: []
-  patterns: [renderWidth-renderHeight-override, positive-drawOffsetY-convention]
-key_files:
+  patterns:
+    - "renderWidth/renderHeight override pattern: furniture objects declare intended display size, engine falls back to sprite region sw/sh"
+    - "drawOffsetY = renderHeight - heightTiles * tileSize (positive shifts sprite up to align bottom with tile footprint)"
+    - "SPRITES constant stores raw source cell coords; FurnitureObject stores intended world-pixel display dimensions"
+
+key-files:
   created: []
   modified:
     - src/shared/types.ts
     - src/engine/ObjectRenderer.ts
     - src/shared/office-layout.ts
-decisions:
-  - "renderWidth/renderHeight override on FurnitureObject is backward-compatible — objects without the fields use raw sw/sh as before"
-  - "drawOffsetY convention corrected to positive values only (positive = shifts sprite UP)"
-  - "SPRITES region table corrected from estimated values to verified PNG pixel coordinates"
-metrics:
-  duration: ~25min
-  completed_date: "2026-03-30"
-  tasks_completed: 2
-  tasks_total: 3
-  files_modified: 3
+
+key-decisions:
+  - "renderWidth/renderHeight added to FurnitureObject as optional fields — engine falls back to raw sprite dimensions if absent, preserving backward compatibility"
+  - "drawOffsetY positive = shift up convention enforced across all 72 furniture objects; previous negative values were inverting the shift direction"
+  - "Phase 5 tuning notes deferred: desks as white rectangles (Kitchen1 asset characteristic), meeting room carpet slight oversize, north wall decoration density, lounge TV/monitor slight oversize — low severity, not blockers"
+
+patterns-established:
+  - "Sprite display size is decoupled from sprite sheet source region — SPRITES constant stores raw cell coords; FurnitureObject stores intended world-pixel dimensions"
+  - "All new furniture added to office-layout.ts must include renderWidth, renderHeight, and drawOffsetY calculated from: drawOffsetY = renderHeight - heightTiles * tileSize"
+
+requirements-completed: [R5.3]
+
+# Metrics
+duration: ~45min
+completed: 2026-03-30
 ---
 
 # Phase 4 Plan 1: ObjectRenderer Sprite Fix Summary
 
-**One-liner:** Corrected 17 wrong SPRITES region coordinates and added renderWidth/renderHeight override to ObjectRenderer so all 72 furniture objects render at correct tile footprint size instead of raw source dimensions.
+**Corrected 17 wrong SPRITES region coordinates and added renderWidth/renderHeight override to ObjectRenderer so all 72 furniture objects render at correct tile footprint size instead of raw source dimensions — visually verified and approved.**
+
+## Performance
+
+- **Duration:** ~45 min
+- **Started:** 2026-03-30T08:45:00Z
+- **Completed:** 2026-03-30T09:30:00Z
+- **Tasks:** 3 (2 auto + 1 checkpoint:human-verify)
+- **Files modified:** 3
+
+## Accomplishments
+
+- Added `renderWidth?` / `renderHeight?` to `FurnitureObject` type; `ObjectRenderer.renderObject()` and `isVisible()` now use these values instead of raw sprite region `sw/sh`
+- Corrected all 17 wrong SPRITES region coordinates (desks, chairs, monitor, TV, kitchen fridge/counter, reception desk, windows, lamps) to verified PNG cell positions
+- Fixed drawOffsetY sign convention on all 72 furniture objects — changed all negative values to correct positive equivalents; formula: `drawOffsetY = renderHeight - heightTiles * tileSize`
+- Visual verification approved: monitors as small flat screens, chairs 1-tile, server racks 4x4 flush, plants/lamps/windows correct, glass lobby door visible, 6 zone colors intact
+
+## Task Commits
+
+Each task was committed atomically:
+
+1. **Task 1: Engine renderWidth/renderHeight fix** - `0f16ee6` (feat)
+2. **Task 2: SPRITES corrections + furniture sizing** - `8018050` (fix)
+3. **Task 3: Visual verification checkpoint** - APPROVED (no commit — checkpoint only)
 
 ## What Was Built
 
@@ -74,27 +121,54 @@ Category B (wrong dimensions):
 - All `drawOffsetY` values corrected from negative (wrong) to positive using formula: `drawOffsetY = renderHeight - heightTiles * tileSize`
 - Zero negative drawOffsetY values remain
 
-## Commits
+### Task 3: Visual verification — APPROVED
 
-| Hash | Message |
-|------|---------|
-| 0f16ee6 | feat(04-01): add renderWidth/renderHeight to FurnitureObject + fix ObjectRenderer |
-| 8018050 | feat(04-01): fix all 17 SPRITES regions + add renderWidth/renderHeight to 72 furniture objects |
+Human verification confirmed (2026-03-30):
+- Monitors now render as small flat screens (no longer oversized)
+- Chairs proper 1-tile size
+- Server racks 4x4 flush
+- Plants, lamps, windows all correctly sized
+- Glass lobby door clearly visible
+- 6 zone colors intact
+
+## Files Created/Modified
+
+- `src/shared/types.ts` — Added `renderWidth?: number` and `renderHeight?: number` to `FurnitureObject` interface
+- `src/engine/ObjectRenderer.ts` — `renderObject()` and `isVisible()` use `obj.renderWidth ?? sw` / `obj.renderHeight ?? sh`
+- `src/shared/office-layout.ts` — 17 SPRITES region corrections; all 72 furniture objects updated with renderWidth/renderHeight/drawOffsetY
+
+## Decisions Made
+
+- `renderWidth/renderHeight` are optional fields with engine fallback to raw sprite dims — existing furniture not requiring overrides is unaffected
+- drawOffsetY positive-up convention enforced; the engine formula `worldY = tileY * tileSize - (drawOffsetY ?? 0)` means positive values shift the sprite upward to prevent it from dropping below its tile footprint
+- Low-severity visual notes from human verification deferred to Phase 5 tuning
 
 ## Deviations from Plan
 
-None — plan executed exactly as written.
+None - plan executed exactly as written.
 
-## Verification
+## Issues Encountered
 
-- `npm run typecheck` passes with zero errors after both tasks
-- 17 SPRITES regions verified by grep for corrected sx values
-- 72 furniture objects have renderWidth (confirmed: 72 matches)
-- Zero negative drawOffsetY values (confirmed: grep "drawOffsetY: -" returns no matches)
+None. All sprite region corrections and drawOffsetY values matched the research document. TypeCheck passed after both task commits.
 
-## Pending
+## User Setup Required
 
-Task 3 (Visual Verification) is a checkpoint:human-verify — awaiting human approval of rendered output.
+None - no external service configuration required.
+
+## Next Phase Readiness
+
+**Phase 5 (Integration & Verification) is unblocked.**
+
+Core rendering is correct. The following low-severity visual items were noted during Phase 4 verification and are candidates for Phase 5 tuning:
+
+| Item | Severity | Notes |
+|------|----------|-------|
+| Desks render as white rectangles | Low | Kitchen1 asset characteristic — the sprite cell contains a mostly-white counter surface. Not a rendering bug. |
+| Meeting room carpet slightly large | Low | renderWidth/renderHeight may need 1-2px trim for tight fit |
+| North wall decorations dense spacing | Low | Painting positions in office-layout.ts may need x-offset adjustment |
+| Lounge TV/monitor slightly oversized | Low | MONITOR renderWidth may need reduction from 32 to 24px |
+
+All blockers from Phase 3 human verification (oversized monitors, displaced server racks, wrong kitchen sprites, misaligned windows) are resolved.
 
 ## Self-Check
 
@@ -103,3 +177,10 @@ Task 3 (Visual Verification) is a checkpoint:human-verify — awaiting human app
 - [x] src/shared/office-layout.ts modified (17 SPRITES + 72 furniture objects)
 - [x] Commits 0f16ee6 and 8018050 exist
 - [x] npm run typecheck passes
+- [x] Task 3 visual checkpoint: APPROVED by human
+
+## Self-Check: PASSED
+
+---
+*Phase: 04-objectrenderer-sprites*
+*Completed: 2026-03-30*

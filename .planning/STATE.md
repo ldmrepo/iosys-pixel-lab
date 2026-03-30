@@ -3,20 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-01-PLAN.md (TileMap Engine Adaptation)
-last_updated: "2026-03-30T08:19:26.686Z"
+stopped_at: Completed 04-01-PLAN.md (ObjectRenderer & Sprites)
+last_updated: "2026-03-30T08:57:59.476Z"
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
 ---
 
 # STATE — v1.0 Office Space Rebuild
 
 ## Current Phase
 
-**In Progress** — P4: ObjectRenderer & Sprites (P1 + P2 + P3 complete)
+**In Progress** — P5: Integration & Verification (P1 + P2 + P3 + P4 complete)
 
 ## Phase Status
 
@@ -25,7 +25,7 @@ progress:
 | P1 | complete | Type & Manifest Expansion — FloorZone, ZONE_INDEX, 8 new sheets, 70+ SPRITES |
 | P2 | complete | Office Layout Design — 30x24 grid, 6 zones, 20 seats, 80+ furniture with walkableMask |
 | P3 | complete | TileMap Engine Adaptation — ZONE_COLORS 6-entry map, walkableMask verification, camera confirmed |
-| P4 | pending | ObjectRenderer & Sprites |
+| P4 | complete | ObjectRenderer & Sprites — renderWidth/renderHeight override, 17 SPRITES fixes, 72 furniture corrected |
 | P5 | pending | Integration & Verification |
 
 ## Decisions
@@ -42,6 +42,9 @@ progress:
 - [Phase 02-office-layout-design]: SOFA_*_FRONT variants use sw:80, sh:48 (not 96x96) matching existing SOFA_FRONT dimensions
 - [Phase 02-office-layout-design]: Meeting room whiteboard uses MONITOR sprite as visual placeholder pending Phase 4 dedicated sprite
 - [Phase 03-tilemap-engine-adaptation]: ZONE_COLORS uses Record<number,string> keyed by spriteIndex (ZONE_INDEX value) not FloorZone string — avoids zone lookup in hot render path
+- [Phase 04-objectrenderer-sprites]: renderWidth/renderHeight added to FurnitureObject as optional fields — engine falls back to raw sprite dimensions if absent
+- [Phase 04-objectrenderer-sprites]: drawOffsetY positive = shift up convention enforced across all 72 furniture objects; previous negative values were inverting the shift direction
+- [Phase 04-objectrenderer-sprites]: Phase 5 tuning candidates deferred: desk white rectangles (asset characteristic), carpet oversize, north wall density, lounge TV oversize — low severity
 
 ## Blockers
 
@@ -49,4 +52,4 @@ progress:
 
 ## Last Session
 
-Stopped at: Completed 03-01-PLAN.md (TileMap Engine Adaptation)
+Stopped at: Completed 04-01-PLAN.md (ObjectRenderer & Sprites)

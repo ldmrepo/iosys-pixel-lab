@@ -7,7 +7,7 @@
 | 1 | 1/1 | Complete   | 2026-03-30 |
 | 2 | Office Layout Design | R1, R3, R4, R6 | 30x24 그리드 + 6존 + 전체 가구 배치 |
 | 3 | 1/1 | Complete   | 2026-03-30 |
-| 4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
+| 4 | 1/1 | Complete   | 2026-03-30 |
 | 5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
 
 ---
@@ -98,7 +98,7 @@ Plans:
 
 **Goal**: 17개 SPRITES region 좌표 교정 + renderWidth/renderHeight 엔진 확장 + 전체 가구 렌더링 크기/오프셋 보정
 **Requirements**: R5.3
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md — Engine renderWidth/renderHeight fix + 17 SPRITES corrections + 72 furniture sizing + visual verification
