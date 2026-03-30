@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
-status: planning
-stopped_at: Phase 10 planned — 2 plans in 2 waves ready for execution
-last_updated: "2026-03-30T21:20:49.988Z"
+status: executing
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-30T21:25:34.129Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 40
 ---
 
@@ -18,7 +18,7 @@ progress:
 ## Current Phase
 
 **Phase 8 of 10** (v1.1) — State Detection
-**Status:** Ready to plan
+**Status:** Executing Phase 10
 
 ## Phase Status
 
@@ -52,6 +52,8 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 09-01]: agentClickCallbacks.length guard moved after bubble check — bubbles dismiss even with no click listeners registered
 - [Phase 09-visual-feedback]: ChimeSound lazy AudioContext on first play() call (browser autoplay policy compliance)
 - [Phase 09-visual-feedback]: muted setter inverted localStorage: stored 'false' means muted so default (missing key) = sound enabled
+- [Phase 10-sub-agents]: Spawn trigger is tool_use blocks (not progress records) — tool_use provides toolCallId immediately for lifecycle tracking
+- [Phase 10-sub-agents]: Sub-agent IDs use negative counter (sub--1, sub--2) — avoids collision with positive agentCounter
 
 ## Accumulated Context (from v1.0)
 
@@ -68,5 +70,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Phase 10 planned — 2 plans in 2 waves ready for execution
+Stopped at: Completed 10-01-PLAN.md
 Resume: `/gsd:plan-phase 8`

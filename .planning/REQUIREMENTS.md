@@ -35,11 +35,11 @@ Requirements for Dynamic Agents milestone. Each maps to roadmap phases.
 
 ### Sub-Agents
 
-- [ ] **SUB-01**: Task/Agent 도구의 progress 레코드에서 서브에이전트를 감지한다
+- [x] **SUB-01**: Task/Agent 도구의 progress 레코드에서 서브에이전트를 감지한다
 - [ ] **SUB-02**: 서브에이전트가 부모 근처 walkable 타일에 음수 ID 캐릭터로 스폰된다
 - [ ] **SUB-03**: 서브에이전트가 부모의 팔레트/색상을 상속받는다
 - [ ] **SUB-04**: 서브에이전트 스폰/디스폰 시 Matrix 이펙트가 재생된다 (컬럼별 stagger)
-- [ ] **SUB-05**: 서브에이전트 작업 완료 시 캐릭터가 자동 제거된다
+- [x] **SUB-05**: 서브에이전트 작업 완료 시 캐릭터가 자동 제거된다
 
 ## v2 Requirements
 
@@ -88,11 +88,11 @@ Deferred to future release.
 | VISUAL-03 | Phase 9 | Complete |
 | VISUAL-04 | Phase 9 | Complete |
 | VISUAL-05 | Phase 9 | Complete |
-| SUB-01 | Phase 10 | Pending |
+| SUB-01 | Phase 10 | Complete |
 | SUB-02 | Phase 10 | Pending |
 | SUB-03 | Phase 10 | Pending |
 | SUB-04 | Phase 10 | Pending |
-| SUB-05 | Phase 10 | Pending |
+| SUB-05 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 22 total
