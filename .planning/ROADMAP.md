@@ -8,7 +8,7 @@
 | 2 | Office Layout Design | R1, R3, R4, R6 | 30x24 그리드 + 6존 + 전체 가구 배치 |
 | 3 | 1/1 | Complete   | 2026-03-30 |
 | 4 | 1/1 | Complete   | 2026-03-30 |
-| 5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
+| 5 | 1/1 | Complete   | 2026-03-30 |
 
 ---
 
@@ -123,7 +123,7 @@ Plans:
 
 **Goal**: 3개 결함 수정 (좌석 수 버그, 비동기 레이스, 폴백 레이아웃) + 전체 시스템 E2E 검증
 **Requirements**: R5.4
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 05-01-PLAN.md — Fix seat count bug + async race condition + FALLBACK_LAYOUT + visual verification

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-01-PLAN.md (ObjectRenderer & Sprites)
-last_updated: "2026-03-30T09:01:50.498Z"
+stopped_at: Checkpoint Task 3 05-01-PLAN.md (visual verification pending)
+last_updated: "2026-03-30T09:24:45.891Z"
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 5
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # STATE — v1.0 Office Space Rebuild
@@ -45,6 +45,8 @@ progress:
 - [Phase 04-objectrenderer-sprites]: renderWidth/renderHeight added to FurnitureObject as optional fields — engine falls back to raw sprite dimensions if absent
 - [Phase 04-objectrenderer-sprites]: drawOffsetY positive = shift up convention enforced across all 72 furniture objects; previous negative values were inverting the shift direction
 - [Phase 04-objectrenderer-sprites]: Phase 5 tuning candidates deferred: desk white rectangles (asset characteristic), carpet oversize, north wall density, lounge TV oversize — low severity
+- [Phase 05-integration-verification]: createPod single-column: removed outer for-i loop so each pod is 2 tiles wide instead of 6, producing 4 seats (not 8)
+- [Phase 05-integration-verification]: layoutReady promise stored on StateMachine instance — waitForLayout() exposes it for async server startup ordering
 
 ## Blockers
 
@@ -52,4 +54,4 @@ progress:
 
 ## Last Session
 
-Stopped at: Completed 04-01-PLAN.md (ObjectRenderer & Sprites)
+Stopped at: Checkpoint Task 3 05-01-PLAN.md (visual verification pending)
