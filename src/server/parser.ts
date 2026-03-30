@@ -16,7 +16,8 @@ interface ContentBlock {
  * This is intentionally loose -- we only extract what we need.
  */
 interface RawJSONLEntry {
-  type?: string; // "user" | "assistant" | "tool_result" | "file-history-snapshot" | "system"
+  type?: string; // "user" | "assistant" | "tool_result" | "file-history-snapshot" | "system" | "progress"
+  subtype?: string;  // e.g. 'turn_duration' for system type, 'queue-operation' for progress type
   message?: {
     role?: string;
     content?: string | ContentBlock[];
@@ -51,13 +52,41 @@ export function parseJSONLLine(line: string, fallbackSessionId: string): AgentEv
   const entryType = raw.type;
   if (!entryType) return null;
 
-  // Skip file-history-snapshot and system metadata
-  if (entryType === 'file-history-snapshot' || entryType === 'system') {
+  // Skip file-history-snapshot
+  if (entryType === 'file-history-snapshot') {
     return null;
   }
 
   const sessionId = raw.sessionId || fallbackSessionId;
   const timestamp = raw.timestamp ? new Date(raw.timestamp).getTime() : Date.now();
+
+  if (entryType === 'system') {
+    // Parse turn_duration subtype — definitive turn end signal
+    if (raw.subtype === 'turn_duration') {
+      return {
+        timestamp,
+        sessionId,
+        type: 'turn_end',
+        content: 'turn_duration',
+        raw,
+      };
+    }
+    return null;
+  }
+
+  if (entryType === 'progress') {
+    // queue-operation indicates background agent activity
+    if (raw.subtype === 'queue-operation') {
+      return {
+        timestamp,
+        sessionId,
+        type: 'queue-operation',
+        content: summarizeContent(raw.content),
+        raw,
+      };
+    }
+    return null;
+  }
 
   if (entryType === 'assistant') {
     return parseAssistantEntry(raw, sessionId, timestamp);
@@ -94,11 +123,14 @@ function parseAssistantEntry(
 
   for (const block of content) {
     if (block.type === 'tool_use' && block.name) {
+      const isBackground = block.name === 'Bash' &&
+        block.input?.run_in_background === true;
       return {
         timestamp,
         sessionId,
-        type: `tool_use:${block.name}`,
+        type: isBackground ? 'background-tool' : `tool_use:${block.name}`,
         content: summarizeToolUse(block.name, block.input),
+        toolName: block.name,
         raw,
       };
     }

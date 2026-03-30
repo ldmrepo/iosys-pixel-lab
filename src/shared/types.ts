@@ -7,6 +7,7 @@ export interface AgentEvent {
   type: string;
   content: string;
   raw: unknown;
+  toolName?: string;             // extracted tool name for tool_use events
 }
 
 export interface AgentState {
@@ -17,6 +18,7 @@ export interface AgentState {
   lastAction: string;
   lastUpdated: number;
   position: { x: number; y: number };
+  permissionPending: boolean;   // true when waiting for tool permission (7s timeout)
 }
 
 export interface WSMessage {
