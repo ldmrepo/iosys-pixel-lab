@@ -1,4 +1,5 @@
-export type AgentStatus = 'idle' | 'typing' | 'reading' | 'executing' | 'waiting' | 'done' | 'error';
+export type AgentStatus = 'idle' | 'typing' | 'reading' | 'executing' | 'waiting' | 'done' | 'error'
+  | 'walk_down' | 'walk_up' | 'walk_right' | 'walk_left';
 
 export interface AgentEvent {
   timestamp: number;

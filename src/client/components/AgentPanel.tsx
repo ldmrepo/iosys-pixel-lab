@@ -7,26 +7,34 @@ interface AgentPanelProps {
 
 function getStatusColor(status: AgentStatus): string {
   const colors: Record<AgentStatus, string> = {
-    typing: 'var(--status-typing)',
-    reading: 'var(--status-reading)',
-    executing: 'var(--status-executing)',
-    waiting: 'var(--status-waiting)',
-    idle: 'var(--status-idle)',
-    done: 'var(--status-done)',
-    error: 'var(--status-error)',
+    typing:     'var(--status-typing)',
+    reading:    'var(--status-reading)',
+    executing:  'var(--status-executing)',
+    waiting:    'var(--status-waiting)',
+    idle:       'var(--status-idle)',
+    done:       'var(--status-done)',
+    error:      'var(--status-error)',
+    walk_down:  'var(--status-idle)',
+    walk_up:    'var(--status-idle)',
+    walk_right: 'var(--status-idle)',
+    walk_left:  'var(--status-idle)',
   };
   return colors[status];
 }
 
 function getStatusLabel(status: AgentStatus): string {
   const labels: Record<AgentStatus, string> = {
-    typing: 'Typing',
-    reading: 'Reading',
-    executing: 'Executing',
-    waiting: 'Waiting',
-    idle: 'Idle',
-    done: 'Done',
-    error: 'Error',
+    typing:     'Typing',
+    reading:    'Reading',
+    executing:  'Executing',
+    waiting:    'Waiting',
+    idle:       'Idle',
+    done:       'Done',
+    error:      'Error',
+    walk_down:  'Walking',
+    walk_up:    'Walking',
+    walk_right: 'Walking',
+    walk_left:  'Walking',
   };
   return labels[status];
 }

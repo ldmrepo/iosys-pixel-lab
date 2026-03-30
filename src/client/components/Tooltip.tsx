@@ -10,13 +10,17 @@ interface TooltipProps {
 
 function getStatusColor(status: AgentStatus): string {
   const colors: Record<AgentStatus, string> = {
-    typing: 'var(--status-typing)',
-    reading: 'var(--status-reading)',
-    executing: 'var(--status-executing)',
-    waiting: 'var(--status-waiting)',
-    idle: 'var(--status-idle)',
-    done: 'var(--status-done)',
-    error: 'var(--status-error)',
+    typing:     'var(--status-typing)',
+    reading:    'var(--status-reading)',
+    executing:  'var(--status-executing)',
+    waiting:    'var(--status-waiting)',
+    idle:       'var(--status-idle)',
+    done:       'var(--status-done)',
+    error:      'var(--status-error)',
+    walk_down:  'var(--status-idle)',
+    walk_up:    'var(--status-idle)',
+    walk_right: 'var(--status-idle)',
+    walk_left:  'var(--status-idle)',
   };
   return colors[status];
 }

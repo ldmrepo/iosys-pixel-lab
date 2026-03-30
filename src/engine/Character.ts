@@ -4,14 +4,18 @@
  * Receives AgentState and converts it into sprite animation, position interpolation,
  * name labels, and status speech bubbles.
  *
- * Sprite sheet layout (4 columns x 7 rows):
- *   Row 0: idle      [0,1]           fps:2
- *   Row 1: typing    [4,5,6,7]       fps:8
- *   Row 2: reading   [8,9]           fps:3
- *   Row 3: executing [12,13,14,15]   fps:6
- *   Row 4: waiting   [16,17]         fps:2
- *   Row 5: done      [20,21]         fps:1
- *   Row 6: error     [24,25]         fps:4
+ * Sprite sheet layout (4 columns x 11 rows):
+ *   Row  0: idle       [0,1]             fps:2
+ *   Row  1: typing     [4,5,6,7]         fps:8
+ *   Row  2: reading    [8,9]             fps:3
+ *   Row  3: executing  [12,13,14,15]     fps:6
+ *   Row  4: waiting    [16,17]           fps:2
+ *   Row  5: done       [20,21]           fps:1
+ *   Row  6: error      [24,25]           fps:4
+ *   Row  7: walk_down  [28,29,30,31]     fps:8
+ *   Row  8: walk_up    [32,33,34,35]     fps:8
+ *   Row  9: walk_right [36,37,38,39]     fps:8
+ *   Row 10: walk_left  [40,41,42,43]     fps:8
  */
 
 import type { AgentState, AgentStatus, SpriteAnimation } from '../shared/types';
@@ -22,13 +26,17 @@ import { CharacterBehavior, type BehaviorConfig } from './CharacterBehavior';
 
 /** Default animation definitions matching the sprite sheet layout spec. */
 const DEFAULT_ANIMATIONS: Record<AgentStatus, SpriteAnimation> = {
-  idle:      { frames: [0, 1],          fps: 2,  loop: true },
-  typing:    { frames: [4, 5, 6, 7],    fps: 8,  loop: true },
-  reading:   { frames: [8, 9],          fps: 3,  loop: true },
-  executing: { frames: [12, 13, 14, 15], fps: 6, loop: true },
-  waiting:   { frames: [16, 17],        fps: 2,  loop: true },
-  done:      { frames: [20, 21],        fps: 1,  loop: true },
-  error:     { frames: [24, 25],        fps: 4,  loop: true },
+  idle:       { frames: [0, 1],           fps: 2,  loop: true },
+  typing:     { frames: [4, 5, 6, 7],     fps: 8,  loop: true },
+  reading:    { frames: [8, 9],           fps: 3,  loop: true },
+  executing:  { frames: [12, 13, 14, 15], fps: 6,  loop: true },
+  waiting:    { frames: [16, 17],         fps: 2,  loop: true },
+  done:       { frames: [20, 21],         fps: 1,  loop: true },
+  error:      { frames: [24, 25],         fps: 4,  loop: true },
+  walk_down:  { frames: [28, 29, 30, 31], fps: 8,  loop: true },
+  walk_up:    { frames: [32, 33, 34, 35], fps: 8,  loop: true },
+  walk_right: { frames: [36, 37, 38, 39], fps: 8,  loop: true },
+  walk_left:  { frames: [40, 41, 42, 43], fps: 8,  loop: true },
 };
 
 /** Movement speed in tiles per second. */

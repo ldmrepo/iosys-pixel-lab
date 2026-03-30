@@ -26,14 +26,18 @@
  *   Hair5 -> Hairs row 2  |  Hair6 -> Hairs row 1
  *   Hair7 -> Hairs row 0
  *
- * Output layout (4 cols x 7 rows, 32x32 per frame = 128x224):
- *   Row 0: idle      [down_idle1, down_idle2, down_idle1, down_idle2]
- *   Row 1: typing    [down_idle1, down_idle2, down_idle1, down_idle2]
- *   Row 2: reading   [down_idle1, down_idle2, -, -]
- *   Row 3: executing [down_walk1, down_walk2, down_walk3, down_walk4]
- *   Row 4: waiting   [down_idle1, down_idle2, -, -]
- *   Row 5: done      [down_idle1, down_idle2, -, -]
- *   Row 6: error     [down_idle1, down_idle2, -, -]
+ * Output layout (4 cols x 11 rows, 32x32 per frame = 128x352):
+ *   Row  0: idle       [down_idle1, down_idle2, down_idle1, down_idle2]
+ *   Row  1: typing     [down_idle1, down_idle2, down_idle1, down_idle2]
+ *   Row  2: reading    [down_idle1, down_idle2, -, -]
+ *   Row  3: executing  [down_walk1, down_walk2, down_walk3, down_walk4]
+ *   Row  4: waiting    [down_idle1, down_idle2, -, -]
+ *   Row  5: done       [down_idle1, down_idle2, -, -]
+ *   Row  6: error      [down_idle1, down_idle2, -, -]
+ *   Row  7: walk_down  [down_walk1, down_walk2, down_walk3, down_walk4]
+ *   Row  8: walk_up    [up_walk1,   up_walk2,   up_walk3,   up_walk4  ]
+ *   Row  9: walk_right [right_walk1,right_walk2,right_walk3,right_walk4]
+ *   Row 10: walk_left  [left_walk1, left_walk2, left_walk3, left_walk4 ]
  *
  * MetroCity down-direction columns:
  *   Col 0 = idle1, Col 1 = idle2
@@ -50,9 +54,9 @@ import * as path from 'path';
 
 const FRAME = 32;
 const OUT_COLS = 4;
-const OUT_ROWS = 7;
-const OUT_W = FRAME * OUT_COLS;  // 128
-const OUT_H = FRAME * OUT_ROWS;  // 224
+const OUT_ROWS = 11;
+const OUT_W = FRAME * OUT_COLS;   // 128
+const OUT_H = FRAME * OUT_ROWS;   // 352
 
 const MC_COLS = 24; // MetroCity spritesheet columns
 
@@ -183,15 +187,18 @@ function compositeTile(
 // ============================================================
 
 /**
- * For each output row, define which MetroCity down-direction columns
+ * For each output row, define which MetroCity direction columns
  * map to which output columns.
  *
- * MetroCity down direction: cols 0-5
- *   0=idle1, 1=idle2, 2=walk1, 3=walk2, 4=walk3, 5=walk4
+ * MetroCity direction columns (24 total):
+ *   Down:  cols  0-5  (0=idle1, 1=idle2, 2=walk1, 3=walk2, 4=walk3, 5=walk4)
+ *   Left:  cols  6-11 (6=idle1, 7=idle2, 8=walk1, 9=walk2,10=walk3,11=walk4)
+ *   Right: cols 12-17 (12=idle1,13=idle2,14=walk1,15=walk2,16=walk3,17=walk4)
+ *   Up:    cols 18-23 (18=idle1,19=idle2,20=walk1,21=walk2,22=walk3,23=walk4)
  */
 interface FrameMapping {
   outCol: number;
-  srcCol: number; // MetroCity column (down direction: 0-5)
+  srcCol: number; // MetroCity column index (0-23)
 }
 
 interface RowMapping {
@@ -213,6 +220,14 @@ const OUTPUT_ROWS: RowMapping[] = [
   { frames: [{ outCol: 0, srcCol: 0 }, { outCol: 1, srcCol: 1 }] },
   // Row 6: error [idle1, idle2]
   { frames: [{ outCol: 0, srcCol: 0 }, { outCol: 1, srcCol: 1 }] },
+  // Row 7: walk_down [down walk1..walk4 from cols 2-5]
+  { frames: [{ outCol: 0, srcCol: 2 }, { outCol: 1, srcCol: 3 }, { outCol: 2, srcCol: 4 }, { outCol: 3, srcCol: 5 }] },
+  // Row 8: walk_up [up walk1..walk4 from cols 20-23]
+  { frames: [{ outCol: 0, srcCol: 20 }, { outCol: 1, srcCol: 21 }, { outCol: 2, srcCol: 22 }, { outCol: 3, srcCol: 23 }] },
+  // Row 9: walk_right [right walk1..walk4 from cols 14-17]
+  { frames: [{ outCol: 0, srcCol: 14 }, { outCol: 1, srcCol: 15 }, { outCol: 2, srcCol: 16 }, { outCol: 3, srcCol: 17 }] },
+  // Row 10: walk_left [left walk1..walk4 from cols 8-11]
+  { frames: [{ outCol: 0, srcCol: 8 }, { outCol: 1, srcCol: 9 }, { outCol: 2, srcCol: 10 }, { outCol: 3, srcCol: 11 }] },
 ];
 
 // ============================================================
