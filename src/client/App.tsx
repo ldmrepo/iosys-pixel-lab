@@ -1,11 +1,13 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useAgentState } from './hooks/useAgentState';
 import OfficeCanvas from './components/OfficeCanvas';
 import AgentPanel from './components/AgentPanel';
 import StatusBar from './components/StatusBar';
 import Tooltip from './components/Tooltip';
-import type { AgentState } from '@shared/types';
+import SoundToggle from './components/SoundToggle';
+import { ChimeSound } from '@engine/ChimeSound';
+import type { AgentState, AgentStatus } from '@shared/types';
 
 interface TooltipData {
   agent: AgentState;
@@ -18,6 +20,48 @@ export default function App() {
   const { agents, agentList } = useAgentState(lastMessage);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const focusOnAgentRef = useRef<((id: string) => void) | null>(null);
+  const chimeRef = useRef<ChimeSound | null>(null);
+  const [soundMuted, setSoundMuted] = useState(() => {
+    const stored = localStorage.getItem('pixel-office-sound-enabled');
+    return stored === 'false';
+  });
+  const prevAgentStatusRef = useRef<Map<string, AgentStatus>>(new Map());
+
+  // Lazy-init chime on first render
+  if (!chimeRef.current) {
+    chimeRef.current = new ChimeSound();
+  }
+
+  useEffect(() => {
+    const chime = chimeRef.current;
+    if (!chime) return;
+
+    const prevStatuses = prevAgentStatusRef.current;
+
+    for (const [id, agent] of agents) {
+      const prevStatus = prevStatuses.get(id);
+      // Play chime when any agent transitions TO 'waiting' from a non-waiting state
+      if (agent.status === 'waiting' && prevStatus !== undefined && prevStatus !== 'waiting') {
+        chime.play();
+        break; // One chime per update cycle is enough
+      }
+    }
+
+    // Update previous status map
+    const newMap = new Map<string, AgentStatus>();
+    for (const [id, agent] of agents) {
+      newMap.set(id, agent.status);
+    }
+    prevAgentStatusRef.current = newMap;
+  }, [agents]);
+
+  const handleSoundToggle = useCallback(() => {
+    const chime = chimeRef.current;
+    if (chime) {
+      const newMuted = chime.toggle();
+      setSoundMuted(newMuted);
+    }
+  }, []);
 
   const handleCanvasAgentClick = useCallback(
     (agentId: string) => {
@@ -52,6 +96,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">Pixel Office</h1>
+        <SoundToggle muted={soundMuted} onToggle={handleSoundToggle} />
       </header>
       <main className="app-main">
         <div className="canvas-wrapper">
