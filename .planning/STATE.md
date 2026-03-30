@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
 status: executing
-stopped_at: Completed 06-01-PLAN.md — 4-direction walk sprites + direction tracking
-last_updated: "2026-03-30T13:42:08.249Z"
+stopped_at: Reached checkpoint in 06-02-PLAN.md — Task 1 complete, Task 2 E2E verification pending
+last_updated: "2026-03-30T13:48:26.393Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -40,6 +40,8 @@ Progress: [░░░░░░░░░░] 0% (0/10 plans)
 - Phase 10 (Sub-Agents)은 Phase 6 + Phase 8 모두 완료 필요
 - [Phase 06-movement-engine]: Used MetroCity native left-direction sprites instead of horizontal-flip: drawFrameFlipped not needed in SpriteSheet.ts
 - [Phase 06-movement-engine]: walk_* variants added directly to AgentStatus union so all Record<AgentStatus,...> maps remain exhaustive at compile time
+- [Phase 06-movement-engine]: workSeat uses layout.seats.find() (first unassigned seat) instead of spawn position — ensures FSM navigates to actual desk tile
+- [Phase 06-movement-engine]: setPath() resets animTime=0 and currentFrameIndex=0 so walk animation starts at frame 0 cleanly
 
 ## Accumulated Context (from v1.0)
 
@@ -56,5 +58,5 @@ Progress: [░░░░░░░░░░] 0% (0/10 plans)
 
 ## Last Session
 
-Stopped at: Completed 06-01-PLAN.md — 4-direction walk sprites + direction tracking
+Stopped at: Reached checkpoint in 06-02-PLAN.md — Task 1 complete, Task 2 E2E verification pending
 Resume: `/gsd:plan-phase 6`
