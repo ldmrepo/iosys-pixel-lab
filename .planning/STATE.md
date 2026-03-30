@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Agents
 status: executing
-stopped_at: Completed 10-01-PLAN.md
-last_updated: "2026-03-30T21:25:34.129Z"
+stopped_at: "Checkpoint: 10-02 Task 2 visual verification pending"
+last_updated: "2026-03-30T21:30:09.767Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 40
 ---
 
@@ -54,6 +54,8 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 - [Phase 09-visual-feedback]: muted setter inverted localStorage: stored 'false' means muted so default (missing key) = sound enabled
 - [Phase 10-sub-agents]: Spawn trigger is tool_use blocks (not progress records) — tool_use provides toolCallId immediately for lifecycle tracking
 - [Phase 10-sub-agents]: Sub-agent IDs use negative counter (sub--1, sub--2) — avoids collision with positive agentCounter
+- [Phase 10-sub-agents]: MatrixEffect column count clamped to 4-8 based on spriteWidth/4 for visible stagger effect
+- [Phase 10-sub-agents]: BFS safety limit set to 200 visited nodes to prevent infinite loop on pathological layouts
 
 ## Accumulated Context (from v1.0)
 
@@ -70,5 +72,5 @@ Progress: [████░░░░░░] 40% (2/5 phases)
 
 ## Last Session
 
-Stopped at: Completed 10-01-PLAN.md
+Stopped at: Checkpoint: 10-02 Task 2 visual verification pending
 Resume: `/gsd:plan-phase 8`
