@@ -710,11 +710,18 @@ export class PixelOfficeEngine {
   };
 
   private onClick = (e: MouseEvent): void => {
-    if (this.agentClickCallbacks.length === 0) return;
-
     const point = this.getCanvasPoint(e);
 
-    // Check all characters for hit
+    // Check bubble hit-test first — dismiss bubble without triggering agent click
+    for (const [, character] of this.characters) {
+      if (character.bubbleHitTest(point.x, point.y, this.camera)) {
+        character.dismissBubble();
+        return;
+      }
+    }
+
+    // Then check character hit-test for agent click callbacks
+    if (this.agentClickCallbacks.length === 0) return;
     for (const [id, character] of this.characters) {
       if (character.hitTest(point.x, point.y, this.camera)) {
         for (const cb of this.agentClickCallbacks) {
