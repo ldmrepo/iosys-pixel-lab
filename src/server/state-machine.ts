@@ -7,6 +7,19 @@ const WAITING_TIMEOUT = 30_000;  // 30s after last assistant message -> waiting
 const IDLE_TIMEOUT = 60_000;     // 60s -> idle
 const DONE_TIMEOUT = 5 * 60_000; // 5m file unchanged -> done
 
+// New detection timers (ms)
+const PERMISSION_TIMER_DELAY_MS = 7_000;   // 7s after non-exempt tool_use -> permission
+const TEXT_IDLE_DELAY_MS = 5_000;           // 5s text-only idle -> waiting
+
+// Tools exempt from permission timer
+const PERMISSION_EXEMPT_TOOLS = new Set(['Task', 'Agent', 'AskUserQuestion']);
+
+interface AgentTimers {
+  permissionTimer: ReturnType<typeof setTimeout> | null;
+  textIdleTimer: ReturnType<typeof setTimeout> | null;
+  hadToolsInTurn: boolean;
+}
+
 // Default fallback seats when office-layout is not available
 const DEFAULT_SEATS: Seat[] = Array.from({ length: 12 }, (_, i) => ({
   id: `seat-${i}`,
@@ -28,6 +41,7 @@ export class AgentStateMachine extends EventEmitter {
   private agentCounter = 0;
   private timeoutCheckInterval: ReturnType<typeof setInterval> | null = null;
   private layoutReady: Promise<void>;
+  private agentTimers: Map<string, AgentTimers> = new Map();
 
   constructor() {
     super();
@@ -75,6 +89,11 @@ export class AgentStateMachine extends EventEmitter {
       clearInterval(this.timeoutCheckInterval);
       this.timeoutCheckInterval = null;
     }
+    // Clear all per-agent timers
+    for (const agentId of this.agentTimers.keys()) {
+      this.cancelAllTimers(agentId);
+    }
+    this.agentTimers.clear();
   }
 
   /**
@@ -88,6 +107,42 @@ export class AgentStateMachine extends EventEmitter {
       agent = this.createAgent(event.sessionId);
     }
 
+    const timers = this.getTimers(agent.id);
+
+    // Any new data cancels active timers
+    this.cancelAllTimers(agent.id);
+    if (agent.permissionPending) {
+      agent.permissionPending = false;
+      // Will emit update below
+    }
+
+    // DETECT-01: turn_end (definitive turn end)
+    if (event.type === 'turn_end') {
+      agent.status = 'waiting';
+      agent.lastAction = event.content;
+      agent.lastUpdated = event.timestamp;
+      timers.hadToolsInTurn = false;
+      this.emit('agent-update', { ...agent });
+      return;
+    }
+
+    // DETECT-04: queue-operation (background agent)
+    if (event.type === 'queue-operation') {
+      // Track but don't change agent status — handled by Plan 02
+      agent.lastUpdated = event.timestamp;
+      this.emit('agent-update', { ...agent });
+      return;
+    }
+
+    // DETECT-04: background-tool (run_in_background)
+    if (event.type === 'background-tool') {
+      agent.lastUpdated = event.timestamp;
+      agent.lastAction = event.content;
+      this.emit('agent-update', { ...agent });
+      return;
+    }
+
+    // Standard event processing
     const previousStatus = agent.status;
     const newStatus = this.deriveStatus(event);
 
@@ -95,7 +150,34 @@ export class AgentStateMachine extends EventEmitter {
     agent.lastAction = event.content;
     agent.lastUpdated = event.timestamp;
 
-    if (previousStatus !== newStatus) {
+    // DETECT-02 setup: Start permission timer for non-exempt tool_use
+    if (event.type.startsWith('tool_use:') && event.toolName) {
+      timers.hadToolsInTurn = true;
+      if (!PERMISSION_EXEMPT_TOOLS.has(event.toolName)) {
+        timers.permissionTimer = setTimeout(() => {
+          timers.permissionTimer = null;
+          const currentAgent = this.agents.get(agent!.id);
+          if (currentAgent && !currentAgent.permissionPending) {
+            currentAgent.permissionPending = true;
+            this.emit('agent-update', { ...currentAgent });
+          }
+        }, PERMISSION_TIMER_DELAY_MS);
+      }
+    }
+
+    // DETECT-05: Start text-idle timer for text-only response
+    if (event.type === 'assistant_text') {
+      timers.textIdleTimer = setTimeout(() => {
+        timers.textIdleTimer = null;
+        const currentAgent = this.agents.get(agent!.id);
+        if (currentAgent && currentAgent.status !== 'waiting' && currentAgent.status !== 'done') {
+          currentAgent.status = 'waiting';
+          this.emit('agent-update', { ...currentAgent });
+        }
+      }, TEXT_IDLE_DELAY_MS);
+    }
+
+    if (previousStatus !== newStatus || agent.permissionPending === false) {
       this.emit('agent-update', { ...agent });
     }
   }
@@ -187,6 +269,40 @@ export class AgentStateMachine extends EventEmitter {
     return 'idle';
   }
 
+  /** Get or create timers for an agent */
+  private getTimers(agentId: string): AgentTimers {
+    let timers = this.agentTimers.get(agentId);
+    if (!timers) {
+      timers = { permissionTimer: null, textIdleTimer: null, hadToolsInTurn: false };
+      this.agentTimers.set(agentId, timers);
+    }
+    return timers;
+  }
+
+  /** Cancel all active timers for an agent */
+  private cancelAllTimers(agentId: string): void {
+    const timers = this.agentTimers.get(agentId);
+    if (!timers) return;
+    if (timers.permissionTimer) { clearTimeout(timers.permissionTimer); timers.permissionTimer = null; }
+    if (timers.textIdleTimer) { clearTimeout(timers.textIdleTimer); timers.textIdleTimer = null; }
+  }
+
+  /** Cancel permission timer only */
+  private cancelPermissionTimer(agentId: string): void {
+    const timers = this.agentTimers.get(agentId);
+    if (!timers?.permissionTimer) return;
+    clearTimeout(timers.permissionTimer);
+    timers.permissionTimer = null;
+  }
+
+  /** Cancel text-idle timer only */
+  private cancelTextIdleTimer(agentId: string): void {
+    const timers = this.agentTimers.get(agentId);
+    if (!timers?.textIdleTimer) return;
+    clearTimeout(timers.textIdleTimer);
+    timers.textIdleTimer = null;
+  }
+
   /**
    * Create a new agent for the given session.
    */
@@ -206,6 +322,7 @@ export class AgentStateMachine extends EventEmitter {
       status: 'idle',
       lastAction: '',
       lastUpdated: Date.now(),
+      permissionPending: false,
       position: seat
         ? { x: seat.tileX, y: seat.tileY }
         : { x: 2 + (this.agentCounter % 6) * 2, y: 2 + Math.floor(this.agentCounter / 6) * 2 },
@@ -222,6 +339,8 @@ export class AgentStateMachine extends EventEmitter {
     const agent = this.agents.get(agentId);
     if (!agent) return;
 
+    this.cancelAllTimers(agentId);
+    this.agentTimers.delete(agentId);
     this.releaseSeat(agentId);
     this.agents.delete(agentId);
     this.emit('agent-removed', { ...agent });
