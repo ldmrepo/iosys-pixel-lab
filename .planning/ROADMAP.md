@@ -111,7 +111,11 @@ Plans:
   2. 사이드 패널에 각 에이전트의 현재 상태(work/walk/idle/permission/waiting)와 활성 도구 이름이 표시된다
   3. 서브에이전트가 부모 에이전트 카드 아래 들여쓰기된 행으로 표시된다
   4. 각 에이전트 카드에 세션 시작 이후 경과 시간이 초 단위로 실시간 업데이트된다
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — CSS layout hardening + panel toggle with localStorage persistence
+- [ ] 11-02-PLAN.md — AgentState createdAt + agent card enrichment (tool name, elapsed time, sub-agent hierarchy)
 
 ### Phase 12: Token & Cost Tracking
 **Goal**: 서버가 JSONL turn_duration 엔트리에서 토큰 사용량을 누적·중복제거하여 USD 비용으로 변환하고, 에이전트 카드에 실시간 표시한다
@@ -153,6 +157,6 @@ Phases execute in this order: 11 → 12 → 13
 | 8. State Detection | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 9. Visual Feedback | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
-| 11. Layout & Dashboard Panel | v1.2 | 0/? | Not started | - |
+| 11. Layout & Dashboard Panel | v1.2 | 0/2 | In Progress | - |
 | 12. Token & Cost Tracking | v1.2 | 0/? | Not started | - |
 | 13. Asset Replacement | v1.2 | 0/? | Not started | - |
