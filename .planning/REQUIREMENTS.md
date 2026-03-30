@@ -17,10 +17,10 @@ Requirements for Dashboard & Polish milestone. Each maps to roadmap phases.
 
 ### Token Tracking
 
-- [ ] **TOKEN-01**: JSONL assistant 엔트리의 message.usage 필드가 파싱되어 에이전트별로 누적된다
-- [ ] **TOKEN-02**: message.id 기반 중복제거로 병렬 도구 호출 시 이중 카운팅을 방지한다
-- [ ] **TOKEN-03**: 모델별 토큰 단가가 적용되어 USD 비용이 계산된다
-- [ ] **TOKEN-04**: 토큰/비용 데이터가 AgentState에 포함되어 WebSocket으로 클라이언트에 전달된다
+- [x] **TOKEN-01**: JSONL assistant 엔트리의 message.usage 필드가 파싱되어 에이전트별로 누적된다
+- [x] **TOKEN-02**: message.id 기반 중복제거로 병렬 도구 호출 시 이중 카운팅을 방지한다
+- [x] **TOKEN-03**: 모델별 토큰 단가가 적용되어 USD 비용이 계산된다
+- [x] **TOKEN-04**: 토큰/비용 데이터가 AgentState에 포함되어 WebSocket으로 클라이언트에 전달된다
 
 ### Asset Replacement
 
@@ -65,10 +65,10 @@ Deferred to future release.
 | DASH-03 | Phase 11 | Complete |
 | DASH-04 | Phase 12 | Pending |
 | DASH-05 | Phase 11 | Complete |
-| TOKEN-01 | Phase 12 | Pending |
-| TOKEN-02 | Phase 12 | Pending |
-| TOKEN-03 | Phase 12 | Pending |
-| TOKEN-04 | Phase 12 | Pending |
+| TOKEN-01 | Phase 12 | Complete |
+| TOKEN-02 | Phase 12 | Complete |
+| TOKEN-03 | Phase 12 | Complete |
+| TOKEN-04 | Phase 12 | Complete |
 | ASSET-01 | Phase 13 | Pending |
 | ASSET-02 | Phase 13 | Pending |
 | ASSET-03 | Phase 13 | Pending |

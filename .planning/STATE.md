@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Phase 12 planned — 2 plans in 2 waves ready for execution
-last_updated: "2026-03-30T23:07:54.890Z"
+stopped_at: Completed 12-01-PLAN.md — server-side token pipeline complete
+last_updated: "2026-03-30T23:13:15.520Z"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # STATE — v1.2 Dashboard & Polish
@@ -44,6 +44,8 @@ v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
 - [Phase 11-layout-dashboard-panel]: Panel toggle button inside canvas-wrapper (absolute, right:0) stays visible when panel collapses to width:0
 - [Phase 11-layout-dashboard-panel]: createdAt is required (not optional) on AgentState — every agent has a creation time
 - [Phase 11-layout-dashboard-panel]: Agent count badge excludes sub-agents — users care about top-level session count
+- [Phase 12-token-cost-tracking]: computeCost uses DEFAULT_PRICING (sonnet rates) for unknown model strings — avoids silently dropping costs
+- [Phase 12-token-cost-tracking]: seenMessageIds lives on AgentTimers (session-lifetime dedup) — not reset per turn
 
 ## Critical Pitfalls to Avoid
 
@@ -80,4 +82,4 @@ v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
 
 ## Last Session
 
-Stopped at: Phase 12 planned — 2 plans in 2 waves ready for execution
+Stopped at: Completed 12-01-PLAN.md — server-side token pipeline complete
