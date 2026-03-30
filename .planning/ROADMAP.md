@@ -114,7 +114,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — CSS layout hardening + panel toggle with localStorage persistence
+- [x] 11-01-PLAN.md — CSS layout hardening + panel toggle with localStorage persistence
 - [ ] 11-02-PLAN.md — AgentState createdAt + agent card enrichment (tool name, elapsed time, sub-agent hierarchy)
 
 ### Phase 12: Token & Cost Tracking
