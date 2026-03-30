@@ -6,7 +6,7 @@
 |-------|------|-------------|-----------------|
 | 1 | 1/1 | Complete   | 2026-03-30 |
 | 2 | Office Layout Design | R1, R3, R4, R6 | 30x24 그리드 + 6존 + 전체 가구 배치 |
-| 3 | TileMap Engine Adaptation | R5.1, R5.2, R5.5 | 존 컬러 시스템 + walkableMask |
+| 3 | 1/1 | Complete   | 2026-03-30 |
 | 4 | ObjectRenderer & Sprites | R5.3 | 신규 가구 렌더링 + 좌표 검증 |
 | 5 | Integration & Verification | R5.4, AC | 패스파인딩 + 좌석배정 + E2E 검증 |
 
@@ -74,7 +74,7 @@ Plans:
 
 **Goal**: 엔진이 확장 맵과 다중 존을 렌더링할 수 있도록 개선
 **Requirements**: R5.1, R5.2, R5.5
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 03-01-PLAN.md — 6존 컬러 시스템 교체 + walkableMask 검증 + 카메라 확인
