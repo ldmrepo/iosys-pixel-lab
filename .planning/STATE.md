@@ -3,33 +3,33 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Completed 12-01-PLAN.md — server-side token pipeline complete
-last_updated: "2026-03-30T23:13:15.520Z"
+stopped_at: Completed 12-02-PLAN.md — Phase 12 complete, agent card token/cost display live
+last_updated: "2026-03-31T00:31:54.408Z"
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # STATE — v1.2 Dashboard & Polish
 
 ## Current Phase
 
-**Phase 11 complete** — All 2/2 plans done. Next: Phase 12
+**Phase 12 complete** — All 2/2 plans done. Next: Phase 13
 
 ## Phase Status
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
 | 11 | Layout & Dashboard Panel | 2/2 | Complete |
-| 12 | Token & Cost Tracking | TBD | Not started |
+| 12 | Token & Cost Tracking | 2/2 | Complete |
 | 13 | Asset Replacement | TBD | Not started |
 
 ## Progress Bar
 
 ```
-v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
+v1.2: [██████████████░░░░░░] 2/3 phases
 ```
 
 ## Decisions
@@ -46,6 +46,8 @@ v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
 - [Phase 11-layout-dashboard-panel]: Agent count badge excludes sub-agents — users care about top-level session count
 - [Phase 12-token-cost-tracking]: computeCost uses DEFAULT_PRICING (sonnet rates) for unknown model strings — avoids silently dropping costs
 - [Phase 12-token-cost-tracking]: seenMessageIds lives on AgentTimers (session-lifetime dedup) — not reset per turn
+- [Phase 12-token-cost-tracking]: costUSD > 0 guard for display — avoids showing $0.00 row for freshly spawned agents
+- [Phase 12-token-cost-tracking]: Token count = input + output combined for compact card view — cache tokens tracked server-side only
 
 ## Critical Pitfalls to Avoid
 
@@ -65,13 +67,12 @@ v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
 - 서버: JSONL 파싱, per-agent 타이머, turn_duration, permission(7s), text-idle(5s), background agent
 - 엔진: 3상태 FSM, BFS, 픽셀아트 말풍선, Web Audio 차임, 서브에이전트 Matrix 이펙트
 - 새 에셋팩 준비됨: PixelOffice (큐비클/소파/자판기, 16px 그리드), Pixel Life (책상/화이트보드), office_assets_release (소형 소품 50×50)
-- AgentState에 tokenUsage? 옵셔널 필드 추가 예정 (types.ts orchestrator 수정)
-- TokenUsage 인터페이스 신규 정의: inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens, costUSD
+- AgentState.tokenUsage 필드 구현 완료 — TokenUsage { inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens, costUSD }
+- 에이전트 카드에 "$X.XX . XX.XK tokens" 실시간 표시 — costUSD > 0일 때만 렌더링
 
 ## Research Flags
 
-- Phase 12 착수 전: JSONL system/turn_duration 엔트리의 usage 정확한 JSON 경로 확인 필요
-  (raw.usage vs raw.message.usage — parser.ts에 console.log 한 줄로 확인)
+- ~~Phase 12 착수 전: JSONL system/turn_duration 엔트리의 usage 정확한 JSON 경로 확인 필요~~ (완료 — raw.usage 경로 확인)
 
 - Phase 13 착수 전: Pixel Life / office_assets_release 스프라이트 좌표 측정 필요
   (PixelOffice 16px 그리드는 확인됨, 나머지 2팩은 이미지 에디터 실측 필요)
@@ -82,4 +83,4 @@ v1.2: [███████░░░░░░░░░░░░░] 1/3 phases
 
 ## Last Session
 
-Stopped at: Completed 12-01-PLAN.md — server-side token pipeline complete
+Stopped at: Completed 12-02-PLAN.md — Phase 12 complete, agent card token/cost display live

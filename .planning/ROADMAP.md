@@ -129,8 +129,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — TokenUsage type + pricing module + parser usage extraction + state-machine accumulation with dedup
-- [ ] 12-02-PLAN.md — AgentPanel token/cost display replacing placeholder + visual verification
+- [x] 12-01-PLAN.md — TokenUsage type + pricing module + parser usage extraction + state-machine accumulation with dedup
+- [x] 12-02-PLAN.md — AgentPanel token/cost display replacing placeholder + visual verification
 
 ### Phase 13: Asset Replacement
 **Goal**: PixelOffice와 Pixel Life 에셋팩의 스프라이트 좌표를 측정·등록하고 오피스 가구를 새 에셋으로 교체하되 기존 엔진이 정상 동작함을 검증한다
@@ -162,5 +162,5 @@ Phases execute in this order: 11 → 12 → 13
 | 9. Visual Feedback | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 11. Layout & Dashboard Panel | v1.2 | Complete    | 2026-03-30 | 2026-03-30 |
-| 12. Token & Cost Tracking | 1/2 | In Progress|  | - |
+| 12. Token & Cost Tracking | v1.2 | 2/2 | Complete | 2026-03-30 |
 | 13. Asset Replacement | v1.2 | 0/? | Not started | - |
