@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "game-asset-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "582d73cfdd3191c54a2d7b3b0e09cf46dfd2ce49351ac44eb1556fc9cfe98699"
+    },
     "pixel-art-sprites": {
       "source": "omer-metin/skills-for-antigravity",
       "sourceType": "github",

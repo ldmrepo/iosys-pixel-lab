@@ -76,7 +76,9 @@ export class SpriteSheet {
     frameIndex: number,
     x: number,
     y: number,
-    scale: number = 1
+    scale: number = 1,
+    exactWidth?: number,
+    exactHeight?: number
   ): void {
     if (!this.image || !this.loaded || this.columns === 0) return;
 
@@ -86,16 +88,21 @@ export class SpriteSheet {
     const sx = col * this.frameWidth;
     const sy = row * this.frameHeight;
 
+    const dx = Math.round(x);
+    const dy = Math.round(y);
+    const dw = exactWidth !== undefined ? exactWidth : Math.round(this.frameWidth * scale);
+    const dh = exactHeight !== undefined ? exactHeight : Math.round(this.frameHeight * scale);
+
     ctx.drawImage(
       this.image,
       sx,
       sy,
       this.frameWidth,
       this.frameHeight,
-      Math.round(x),
-      Math.round(y),
-      Math.round(this.frameWidth * scale),
-      Math.round(this.frameHeight * scale)
+      dx,
+      dy,
+      dw,
+      dh
     );
   }
 }
