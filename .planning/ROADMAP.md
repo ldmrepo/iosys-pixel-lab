@@ -98,7 +98,7 @@ Plans:
 
 - [x] **Phase 11: Layout & Dashboard Panel** - 안정적인 3열 레이아웃 위에 에이전트 상태/계층/세션 패널 구축 (completed 2026-03-30)
 - [x] **Phase 12: Token & Cost Tracking** - JSONL turn_duration 기반 토큰 파이프라인 + 에이전트 카드 비용 표시 (completed 2026-03-31)
-- [ ] **Phase 13: Asset Replacement** - PixelOffice/Pixel Life 에셋팩으로 오피스 전면 교체 + 엔진 호환성 검증
+- [ ] **Phase 13: Asset Replacement** - PixelOffice 에셋팩으로 오피스 전면 교체 + 엔진 호환성 검증
 
 ## Phase Details
 
@@ -133,15 +133,19 @@ Plans:
 - [x] 12-02-PLAN.md — AgentPanel token/cost display replacing placeholder + visual verification
 
 ### Phase 13: Asset Replacement
-**Goal**: PixelOffice와 Pixel Life 에셋팩의 스프라이트 좌표를 측정·등록하고 오피스 가구를 새 에셋으로 교체하되 기존 엔진이 정상 동작함을 검증한다
+**Goal**: PixelOffice 에셋팩의 스프라이트 좌표를 측정·등록하고 오피스 가구를 새 에셋으로 교체하되 기존 엔진이 정상 동작함을 검증한다
 **Depends on**: Phase 11
 **Requirements**: ASSET-01, ASSET-02, ASSET-03, ASSET-04, ASSET-05
 **Success Criteria** (what must be TRUE):
-  1. PixelOffice와 Pixel Life 스프라이트가 asset-manifest.ts에 좌표와 함께 등록되어 있다
-  2. 오피스 주요 가구(데스크, 의자, 소파 등)가 새 에셋팩 스프라이트로 렌더링된다
+  1. PixelOffice 스프라이트가 asset-manifest.ts에 좌표와 함께 등록되어 있다
+  2. 오피스 주요 가구(데스크, 의자, 소파 등)가 PixelOffice 스프라이트로 렌더링된다
   3. 교체 후 FSM 이동, BFS 경로탐색, 말풍선, 서브에이전트 이펙트가 모두 정상 동작한다
   4. 캐릭터가 교체된 가구와 충돌하지 않고 walkable 타일을 올바르게 탐색한다
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — PixelOffice sprite sheet deployment + asset-manifest.ts replacement + SPRITES constant definition
+- [ ] 13-02-PLAN.md — Office layout redesign (zones, cubicle rows, lobby furniture) + visual verification
 
 ## Progress
 
@@ -163,4 +167,4 @@ Phases execute in this order: 11 → 12 → 13
 | 10. Sub-Agents | v1.1 | 2/2 | Complete | 2026-03-30 |
 | 11. Layout & Dashboard Panel | v1.2 | Complete    | 2026-03-30 | 2026-03-30 |
 | 12. Token & Cost Tracking | v1.2 | Complete    | 2026-03-31 | 2026-03-30 |
-| 13. Asset Replacement | v1.2 | 0/? | Not started | - |
+| 13. Asset Replacement | v1.2 | 0/2 | Not started | - |
