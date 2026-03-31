@@ -2,14 +2,10 @@ import type { OfficeLayout, TileInfo, Seat, FurnitureObject, FloorZone } from '.
 import { ZONE_INDEX } from './types';
 
 // ─── Zone Boundary Constants ────────────────────────────────
-// All coordinates inclusive, interior only (excludes outer walls)
 const ZONES = {
-  server:  { x1: 1,  y1: 1,  x2: 8,  y2: 9  },   // top-left 8x9
-  workA:   { x1: 9,  y1: 1,  x2: 28, y2: 9  },   // top-right 20x9
-  workB:   { x1: 1,  y1: 11, x2: 14, y2: 15 },   // mid-left 14x5 (y=10 is partition wall row)
-  meeting: { x1: 16, y1: 11, x2: 21, y2: 15 },   // mid-right interior (walls at x=15, x=22, y=10, y=16)
-  lounge:  { x1: 1,  y1: 17, x2: 14, y2: 22 },   // lower-left 14x6 (y=16 has partial meeting south wall)
-  lobby:   { x1: 15, y1: 17, x2: 28, y2: 22 },   // lower-right 14x6
+  lobby:  { x1: 1,  y1: 1,  x2: 28, y2: 7  },  // top: elevator, sofas, machines, plants, windows
+  workA:  { x1: 1,  y1: 9,  x2: 28, y2: 13 },  // mid: cubicle row 1 (5 cubicles)
+  workB:  { x1: 1,  y1: 15, x2: 28, y2: 20 },  // bot: cubicle row 2 (5 cubicles)
 } as const;
 
 // ─── Tile Helpers ────────────────────────────────────────────
@@ -18,15 +14,23 @@ const floor = (zone: FloorZone): TileInfo => ({
   type: 'floor', walkable: true, spriteIndex: ZONE_INDEX[zone], zone,
 });
 
-// ─── 30×24 Tile Grid (unified floor) ─────────────────────────
+// ─── 30×24 Tile Grid ─────────────────────────────────────────
 const tiles: TileInfo[][] = [];
 for (let y = 0; y < 24; y++) {
   const row: TileInfo[] = [];
   for (let x = 0; x < 30; x++) {
     if (y === 0 || y === 23 || x === 0 || x === 29) {
       row.push(wall());
+    } else if (y >= 1 && y <= 7) {
+      row.push(floor('lobby'));
+    } else if (y === 8 || y === 14 || y === 21 || y === 22) {
+      row.push(floor('corridor'));    // corridors between zones
+    } else if (y >= 9 && y <= 13) {
+      row.push(floor('work'));        // cubicle row 1
+    } else if (y >= 15 && y <= 20) {
+      row.push(floor('work'));        // cubicle row 2
     } else {
-      row.push(floor('work'));
+      row.push(floor('corridor'));
     }
   }
   tiles.push(row);
@@ -80,11 +84,190 @@ const SPRITES = {
   PLANT_RIGHT:     { sheetId: 'pixelOffice', region: { sx: 213, sy: 63, sw: 18, sh: 40 } },
 } as const;
 
-// ---- Furniture & Seats (to be populated in Plan 02) ----
+// ─── Furniture & Seats ───────────────────────────────────────
 const furniture: FurnitureObject[] = [];
 const seats: Seat[] = [];
+let seatId = 1;
 
-// Verify all furniture has walkableMask
+// Chair color cycle for visual variety
+const CHAIR_COLORS = [
+  SPRITES.CHAIR_ORANGE, SPRITES.CHAIR_YELLOW, SPRITES.CHAIR_GREEN,
+  SPRITES.CHAIR_BLUE,   SPRITES.CHAIR_WHITE,  SPRITES.CHAIR_GRAY,
+];
+
+/**
+ * Create a row of cubicles (desk + chair = 1 seat each).
+ * Desk at (x, deskY) — 2 tiles wide, 1 tile high, non-walkable.
+ * Chair at (x, deskY-1) — 1 tile wide, walkable (seat tile), character faces down.
+ * drawOffsetY > 0 moves sprite UP (above tile origin).
+ * sortY on chairs = chairY - 1 so chairs render behind the seated character.
+ */
+function createCubicleRow(startX: number, deskY: number, count: number, prefix: string) {
+  const spacing = 4; // 2-tile desk + 2-tile gap between cubicles
+  for (let i = 0; i < count; i++) {
+    const x = startX + i * spacing;
+    const id = `s${seatId++}`;
+    const chairY = deskY - 1;
+
+    // Cubicle desk: 26x21px original, 2-tile footprint
+    // Alternate between CUBICLE_DESK_A and CUBICLE_DESK_B for variety
+    furniture.push({
+      id: `desk-${prefix}-${i}`, type: 'desk',
+      tileX: x, tileY: deskY, widthTiles: 2, heightTiles: 1,
+      walkableMask: [false, false],
+      sprite: i % 2 === 0 ? SPRITES.CUBICLE_DESK_A : SPRITES.CUBICLE_DESK_B,
+      renderWidth: 26, renderHeight: i % 2 === 0 ? 21 : 25,
+      drawOffsetX: -3, drawOffsetY: 4,
+    });
+
+    // Chair: 11x22px original, 1-tile footprint
+    furniture.push({
+      id: `chair-${id}`, type: 'chair',
+      tileX: x, tileY: chairY, widthTiles: 1, heightTiles: 1,
+      walkableMask: [true],
+      sprite: CHAIR_COLORS[i % CHAIR_COLORS.length],
+      renderWidth: 11, renderHeight: 22,
+      seatId: id,
+      drawOffsetX: 3, drawOffsetY: 0,
+      sortY: chairY - 1,
+    });
+
+    seats.push({
+      id, tileX: x, tileY: chairY,
+      deskTileX: x, deskTileY: deskY,
+      facing: 'down',
+    });
+  }
+}
+
+// ── Cubicle Row 1: 5 cubicles at y=10 (desks), y=9 (chairs) ──
+createCubicleRow(2, 10, 5, 'A');
+
+// ── Cubicle Row 2: 5 cubicles at y=16 (desks), y=15 (chairs) ──
+createCubicleRow(2, 16, 5, 'B');
+
+// Total: 10 seats
+
+// ── Lobby: Elevator (center, against top wall) ──
+furniture.push({
+  id: 'elevator', type: 'door',
+  tileX: 12, tileY: 1, widthTiles: 3, heightTiles: 2,
+  walkableMask: [false, false, false, false, false, false],
+  sprite: SPRITES.ELEVATOR,
+  renderWidth: 48, renderHeight: 32,
+  drawOffsetX: 0, drawOffsetY: 0,
+});
+
+// ── Lobby: Window panels (left and right sides, on top wall) ──
+furniture.push({
+  id: 'window-left', type: 'window',
+  tileX: 2, tileY: 1, widthTiles: 5, heightTiles: 1,
+  walkableMask: [false, false, false, false, false],
+  sprite: SPRITES.WINDOW_PANEL,
+  renderWidth: 79, renderHeight: 17,
+  drawOffsetX: 0, drawOffsetY: 0,
+  layer: 'wall',
+});
+furniture.push({
+  id: 'window-right', type: 'window',
+  tileX: 19, tileY: 1, widthTiles: 5, heightTiles: 1,
+  walkableMask: [false, false, false, false, false],
+  sprite: SPRITES.WINDOW_PANEL,
+  renderWidth: 79, renderHeight: 17,
+  drawOffsetX: 0, drawOffsetY: 0,
+  layer: 'wall',
+});
+
+// ── Lobby: Plants (flanking elevator) ──
+furniture.push({
+  id: 'plant-left', type: 'plant',
+  tileX: 10, tileY: 2, widthTiles: 1, heightTiles: 1,
+  walkableMask: [false],
+  sprite: SPRITES.PLANT_LEFT,
+  renderWidth: 15, renderHeight: 38,
+  drawOffsetX: 0, drawOffsetY: 22,
+});
+furniture.push({
+  id: 'plant-right', type: 'plant',
+  tileX: 16, tileY: 2, widthTiles: 1, heightTiles: 1,
+  walkableMask: [false],
+  sprite: SPRITES.PLANT_RIGHT,
+  renderWidth: 18, renderHeight: 40,
+  drawOffsetX: 0, drawOffsetY: 24,
+});
+
+// ── Lobby: Sofas (decorative, no seats) ──
+furniture.push({
+  id: 'sofa-1', type: 'sofa',
+  tileX: 4, tileY: 5, widthTiles: 2, heightTiles: 1,
+  walkableMask: [false, false],
+  sprite: SPRITES.SOFA_ORANGE,
+  renderWidth: 26, renderHeight: 16,
+  drawOffsetX: -3, drawOffsetY: 0,
+});
+furniture.push({
+  id: 'sofa-2', type: 'sofa',
+  tileX: 7, tileY: 5, widthTiles: 2, heightTiles: 1,
+  walkableMask: [false, false],
+  sprite: SPRITES.SOFA_WHITE,
+  renderWidth: 26, renderHeight: 20,
+  drawOffsetX: -3, drawOffsetY: 0,
+});
+
+// ── Lobby: Vending machines (left wall) ──
+furniture.push({
+  id: 'machine-1', type: 'appliance',
+  tileX: 1, tileY: 3, widthTiles: 2, heightTiles: 1,
+  walkableMask: [false, false],
+  sprite: SPRITES.MACHINE_ORANGE,
+  renderWidth: 40, renderHeight: 16,
+  drawOffsetX: -4, drawOffsetY: 0,
+});
+furniture.push({
+  id: 'machine-2', type: 'appliance',
+  tileX: 1, tileY: 4, widthTiles: 2, heightTiles: 1,
+  walkableMask: [false, false],
+  sprite: SPRITES.MACHINE_GRAY,
+  renderWidth: 33, renderHeight: 15,
+  drawOffsetX: 0, drawOffsetY: 0,
+});
+
+// ── Lobby: Snack racks (right side) ──
+furniture.push({
+  id: 'rack-1', type: 'appliance',
+  tileX: 26, tileY: 3, widthTiles: 2, heightTiles: 2,
+  walkableMask: [false, false, false, false],
+  sprite: SPRITES.RACK_GRAY,
+  renderWidth: 24, renderHeight: 49,
+  drawOffsetX: 0, drawOffsetY: 17,
+});
+furniture.push({
+  id: 'rack-2', type: 'appliance',
+  tileX: 26, tileY: 5, widthTiles: 2, heightTiles: 2,
+  walkableMask: [false, false, false, false],
+  sprite: SPRITES.RACK_PINK,
+  renderWidth: 24, renderHeight: 50,
+  drawOffsetX: 0, drawOffsetY: 18,
+});
+
+// ── Mark furniture footprint tiles as non-walkable ──────────
+for (const obj of furniture) {
+  if (!obj.walkableMask) continue;
+  for (let dy = 0; dy < obj.heightTiles; dy++) {
+    for (let dx = 0; dx < obj.widthTiles; dx++) {
+      const idx = dy * obj.widthTiles + dx;
+      if (!obj.walkableMask[idx]) {
+        const ty = obj.tileY + dy;
+        const tx = obj.tileX + dx;
+        if (ty >= 0 && ty < 24 && tx >= 0 && tx < 30) {
+          tiles[ty][tx].walkable = false;
+        }
+      }
+    }
+  }
+}
+
+// ── Verify all furniture has walkableMask ────────────────────
 const missing = furniture.filter(f => !f.walkableMask);
 if (missing.length > 0) {
   throw new Error(`Furniture missing walkableMask: ${missing.map(f => f.id).join(', ')}`);
@@ -97,6 +280,5 @@ export const officeLayout: OfficeLayout = {
 
 export default officeLayout;
 
-// Suppress unused variable warnings for SPRITES and ZONES (used in Plan 02)
-void SPRITES;
+// Suppress unused variable warnings
 void ZONES;
