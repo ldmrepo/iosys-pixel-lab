@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Completed 13-01-PLAN.md
-last_updated: "2026-03-31T01:18:57.924Z"
+stopped_at: "Checkpoint: 13-02 Task 2 visual verification pending"
+last_updated: "2026-03-31T01:23:49.151Z"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # STATE — v1.2 Dashboard & Polish
@@ -50,6 +50,8 @@ v1.2: [██████████████░░░░░░] 2/3 phases
 - [Phase 12-token-cost-tracking]: Token count = input + output combined for compact card view — cache tokens tracked server-side only
 - [Phase 13-asset-replacement]: PixelOffice only: single pixelOffice furnitureSheet, all MetroCity entries removed
 - [Phase 13-asset-replacement]: SPRITES constant holds 23 PixelOffice entries (pngjs-measured), furniture/seats empty stubs for Plan 02
+- [Phase 13-asset-replacement]: spacing=4 in createCubicleRow (2-tile desk + 2-tile gap) for walkable corridors between cubicles
+- [Phase 13-asset-replacement]: Corridor tiles at y=8,14,21-22 remain walkable for BFS character movement between office zones
 
 ## Critical Pitfalls to Avoid
 
@@ -85,4 +87,4 @@ v1.2: [██████████████░░░░░░] 2/3 phases
 
 ## Last Session
 
-Stopped at: Completed 13-01-PLAN.md
+Stopped at: Checkpoint: 13-02 Task 2 visual verification pending

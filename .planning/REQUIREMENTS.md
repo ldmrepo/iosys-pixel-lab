@@ -25,10 +25,10 @@ Requirements for Dashboard & Polish milestone. Each maps to roadmap phases.
 ### Asset Replacement
 
 - [x] **ASSET-01**: PixelOffice 에셋팩의 스프라이트 좌표가 측정되어 asset-manifest.ts에 등록된다
-- [ ] **ASSET-02**: 기존 MetroCity 가구가 PixelOffice 오피스 가구로 교체된다 (데스크, 의자, 소파 등)
+- [x] **ASSET-02**: 기존 MetroCity 가구가 PixelOffice 오피스 가구로 교체된다 (데스크, 의자, 소파 등)
 - [x] **ASSET-03**: Pixel Life 소품이 회의실/작업공간에 보조 배치된다 (화이트보드, 차트 등)
-- [ ] **ASSET-04**: office-layout.ts가 새 에셋에 맞게 재설계된다
-- [ ] **ASSET-05**: 교체 후 기존 엔진(FSM/BFS/말풍선/서브에이전트)이 정상 동작한다
+- [x] **ASSET-04**: office-layout.ts가 새 에셋에 맞게 재설계된다
+- [x] **ASSET-05**: 교체 후 기존 엔진(FSM/BFS/말풍선/서브에이전트)이 정상 동작한다
 
 ## v2 Requirements
 
@@ -70,10 +70,10 @@ Deferred to future release.
 | TOKEN-03 | Phase 12 | Complete |
 | TOKEN-04 | Phase 12 | Complete |
 | ASSET-01 | Phase 13 | Complete |
-| ASSET-02 | Phase 13 | Pending |
+| ASSET-02 | Phase 13 | Complete |
 | ASSET-03 | Phase 13 | Complete |
-| ASSET-04 | Phase 13 | Pending |
-| ASSET-05 | Phase 13 | Pending |
+| ASSET-04 | Phase 13 | Complete |
+| ASSET-05 | Phase 13 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 14 total
