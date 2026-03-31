@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Dashboard & Polish
 status: unknown
-stopped_at: Phase 13 planned — 2 plans in 2 waves
-last_updated: "2026-03-31T01:10:25.726Z"
+stopped_at: Completed 13-01-PLAN.md
+last_updated: "2026-03-31T01:18:57.924Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # STATE — v1.2 Dashboard & Polish
@@ -48,6 +48,8 @@ v1.2: [██████████████░░░░░░] 2/3 phases
 - [Phase 12-token-cost-tracking]: seenMessageIds lives on AgentTimers (session-lifetime dedup) — not reset per turn
 - [Phase 12-token-cost-tracking]: costUSD > 0 guard for display — avoids showing $0.00 row for freshly spawned agents
 - [Phase 12-token-cost-tracking]: Token count = input + output combined for compact card view — cache tokens tracked server-side only
+- [Phase 13-asset-replacement]: PixelOffice only: single pixelOffice furnitureSheet, all MetroCity entries removed
+- [Phase 13-asset-replacement]: SPRITES constant holds 23 PixelOffice entries (pngjs-measured), furniture/seats empty stubs for Plan 02
 
 ## Critical Pitfalls to Avoid
 
@@ -83,4 +85,4 @@ v1.2: [██████████████░░░░░░] 2/3 phases
 
 ## Last Session
 
-Stopped at: Phase 13 planned — 2 plans in 2 waves
+Stopped at: Completed 13-01-PLAN.md
