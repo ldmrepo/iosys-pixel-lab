@@ -1,5 +1,26 @@
 # MILESTONES
 
+## v1.2 Dashboard & Polish (Shipped: 2026-03-31)
+
+**Phases completed:** 3 phases, 6 plans | **Timeline:** 2026-03-30 ~ 2026-03-31 | **Commits:** 18 feat
+
+| Phase | Name | Plans | Summary |
+|-------|------|-------|---------|
+| P11 | Layout & Dashboard Panel | 2/2 | 3열 CSS 레이아웃 + 패널 토글 + 에이전트 카드(상태/도구/시간/계층) |
+| P12 | Token & Cost Tracking | 2/2 | pricing.ts + JSONL usage 파싱 + message.id 중복제거 + 카드 표시 |
+| P13 | Asset Replacement | 2/2 | PixelOffice CC0 에셋 전면 교체 + 3존 레이아웃 + 10좌석 |
+
+**Key accomplishments:**
+
+- 3열 CSS 레이아웃: Canvas + 사이드 패널 안정적 공존 (flex:1 + min-width:0)
+- 에이전트 카드: 상태 dot, 도구명, 경과시간, 서브에이전트 들여쓰기 계층
+- 토큰/비용 파이프라인: turn_duration → pricing.ts → message.id 중복제거 → $X.XX · XX.XK 표시
+- PixelOffice CC0 에셋팩으로 전면 교체: 25개 MetroCity 시트 → 1개 PixelOffice 시트 (23 스프라이트)
+- 3존 오피스 재설계: 로비(엘리베이터/소파/자판기) + 큐비클 2열(10좌석)
+- v1.2 요구사항 14/14 완료 (DASH-01~05, TOKEN-01~04, ASSET-01~05)
+
+---
+
 ## v1.1 Dynamic Agents (Shipped: 2026-03-30)
 
 **Phases completed:** 5 phases, 9 plans | **Timeline:** 2026-03-30 ~ 2026-03-31 | **Commits:** 13 feat
